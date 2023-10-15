@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Converter-a83928d3-981b-4752-aba4-bb3235916cc4</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Calabonga.Microservices.Core" Version="5.1.0" />
+    <PackageReference Include="MassTransit" Version="7.3.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.3.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.1-dev-00320" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00968" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ExchangeData">
+      <HintPath>..\..\ExchangeData\ExchangeData\bin\Debug\net6.0\ExchangeData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
