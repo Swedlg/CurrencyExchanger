@@ -1,8 +1,9 @@
-﻿using ExchangeData;
+﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Storage.Core.BusinessLogics.Interfaces;
 using Storage.Database;
-using Storage.Repositories;
+using Storage.Database.Repositories;
+using Storage.Main.Consumers;
 
 namespace Storage.Main.Extensions
 {
@@ -23,19 +24,40 @@ namespace Storage.Main.Extensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            services.AddLogging();
+
             services.AddDbContext<CurrencyStorageDbContext>(options =>
                         options.UseNpgsql(configuration.GetConnectionString("CurrencyStorageConnectionDbString")));
 
             services.AddScoped<ICurrencyInfoRepository, CurrencyInfoRepository>();
             services.AddScoped<ICurrencyValueByDateRepository, CurrencyValueByDateRepository>();
 
-            var rabbitSection = configuration.GetSection("RabbitServer");
-            var serviceSection = configuration.GetSection("ServiceInfo");
-            ConfigureServicesMassTransit.ConfigureServices(services, configuration, new MassTransitConfiguration
+            services.AddMassTransit(busConfigurator =>
             {
-                IsDebug = rabbitSection.GetValue<bool>("IsDebug"),
-                ServiceName = serviceSection.GetValue<string>("ServiceName"),
+                //busConfigurator.AddConsumers(Assembly.GetExecutingAssembly());
+                busConfigurator.AddConsumer<CurrencyInfoCostumer>();
+                busConfigurator.AddConsumer<CurrencyValueByDateConsumer>();
+
+                var rabbitSection = configuration.GetSection("RabbitServer");
+
+                string url = rabbitSection.GetValue<string>("Url");
+                string host = rabbitSection.GetValue<string>("Host");
+                string user = rabbitSection.GetValue<string>("User");
+                string password = rabbitSection.GetValue<string>("Password");
+
+                busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
+                {
+                    busFactoryConfigurator.Host($"rabbitmq://{url}/{host}", cfg =>
+                    {
+                        cfg.Username("currency-exchanger-guest");
+                        cfg.Password("currency-exchanger-guest");
+                    });
+
+                    busFactoryConfigurator.ConfigureEndpoints(context);
+                });
             });
+
+            services.AddMassTransitHostedService();
         }
     }
 }

@@ -8,6 +8,10 @@ namespace Storage.Database
     /// </summary>
     public class CurrencyStorageDbContext : DbContext
     {
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="options">Опции.</param>
         public CurrencyStorageDbContext(DbContextOptions options) : base(options)
         {
         }
@@ -20,6 +24,6 @@ namespace Storage.Database
         /// <summary>
         /// Значения валют по датам.
         /// </summary>
-        public DbSet<CurrencyValueByDate> currencyValueByDates { get; set; }
+        public DbSet<CurrencyValueByDate> CurrencyValueByDates { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Crawler.Core.BindingModels;
-using ExchangeData.DTOModels;
+using ExchangeData.DTOModels.CrawlerToConvert;
+using ExchangeData.DTOModels.CrawlerToStorage;
 using System.Xml;
 
 namespace Crawler.Core.BusinessLogics.Helpers
@@ -17,6 +18,13 @@ namespace Crawler.Core.BusinessLogics.Helpers
         public static CurrencyInfoListDTO ParseXmlCurrencyInfoToDTO(string xmlString)
         {
             List<CurrencyInfoDTO> itemList = new List<CurrencyInfoDTO>();
+            
+            itemList.Add(new CurrencyInfoDTO(
+               "R00000",
+               "Рубль",
+               "Ruble",
+               "R00000",
+               "RUB"));
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlString);
@@ -41,25 +49,26 @@ namespace Crawler.Core.BusinessLogics.Helpers
         /// </summary>
         /// <param name="xmlString">XML строка.</param>
         /// <returns>Объект CurrencyValueByDateListDTO.</returns>
-        public static CurrencyValueByDateListDTO ParseXmlCurrencyValueByDateToDTO(string xmlString)
+        public static RubleQuotesByDateDTO ParseXmlCurrencyQuotesByDateToDTO(string xmlString)
         {
-            List<CurrencyValueByDateDTO> itemList = new List<CurrencyValueByDateDTO>();
+            List<RubleQuoteDTO> itemList = new List<RubleQuoteDTO>();
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlString);
-            DateOnly date = DateOnly.Parse(xmlDoc.SelectSingleNode("ValCurs").Attributes["Date"].Value);
+
+            DateTime date = DateTime.Parse(xmlDoc.SelectSingleNode("ValCurs").Attributes["Date"].Value);
             XmlNodeList itemNodes = xmlDoc.GetElementsByTagName("Valute");
 
             foreach (XmlNode itemNode in itemNodes)
             {
-                CurrencyValueByDateDTO item = new CurrencyValueByDateDTO(
+                RubleQuoteDTO item = new RubleQuoteDTO(
                     "R00000",
                     itemNode.Attributes["ID"].Value,
                     Convert.ToDecimal(itemNode.SelectSingleNode("VunitRate").InnerText));
                 itemList.Add(item);
             }
 
-            return new CurrencyValueByDateListDTO(date, itemList);
+            return new RubleQuotesByDateDTO(date, itemList);
         }
 
         /// <summary>
@@ -97,9 +106,9 @@ namespace Crawler.Core.BusinessLogics.Helpers
         /// </summary>
         /// <param name="xmlString">XML строка.</param>
         /// <returns>Список информации о валютных котировках по датам.</returns>
-        public static List<CurrencyValueByDateBindingModel> ParseXmlCurrencyValueByDate(List<string> xmlStrings)
+        public static List<RubleQuoteByDateBindingModel> ParseXmlCurrencyValueByDate(List<string> xmlStrings)
         {
-            List<CurrencyValueByDateBindingModel> itemList = new List<CurrencyValueByDateBindingModel>();
+            List<RubleQuoteByDateBindingModel> itemList = new List<RubleQuoteByDateBindingModel>();
 
             XmlDocument xmlDoc = new XmlDocument();
 
@@ -111,7 +120,7 @@ namespace Crawler.Core.BusinessLogics.Helpers
 
                 foreach (XmlNode itemNode in itemNodes)
                 {
-                    CurrencyValueByDateBindingModel item = new CurrencyValueByDateBindingModel
+                    RubleQuoteByDateBindingModel item = new RubleQuoteByDateBindingModel
                     {
                         Id = itemNode.Attributes["ID"].Value,
                         Date = date,

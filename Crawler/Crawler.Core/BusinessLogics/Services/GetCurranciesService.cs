@@ -1,5 +1,7 @@
 ﻿using Crawler.Core.BusinessLogics.Helpers;
 using ExchangeData.DTOModels;
+using ExchangeData.DTOModels.CrawlerToConvert;
+using ExchangeData.DTOModels.CrawlerToStorage;
 using Newtonsoft.Json;
 
 namespace Crawler.Core.BusinessLogics.Services
@@ -46,52 +48,31 @@ namespace Crawler.Core.BusinessLogics.Services
         }
 
         /// <summary>
-        /// Асинхронный метод пролучения данных о валютных котировках по дате.
+        /// Асинхронный метод пролучения данных о валютных котировках по дате. Например 02/03/2022.
         /// </summary>
         /// <param name="url">URL.</param>
-        /// <param name="fromDate">Запросить до определенной даты.</param>
+        /// <param name="date">Дата.</param>
         /// <returns>:)</returns>
-        public static async Task<CurrencyValuesByDatesListDTO> GetCurrencyByDateByURLAsync(DateOnly? fromDate, string url = "http://cbr.ru/scripts/XML_daily.asp?date_req=")
-        {    
-            List<string> xmlStringList = new List<string>();
-
+        public static async Task<RubleQuotesByDateDTO> GetCurrencyByDateByURLAsync(DateOnly date, string url = "http://cbr.ru/scripts/XML_daily.asp?date_req=")
+        {
+            string xmlString;
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
-                    DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
-                    if (fromDate == null)
-                    {
-                        fromDate = currentDate.AddYears(-2);         
-                    }
-
-                    DateOnly iteratorDate = (DateOnly) fromDate;
-                    while (iteratorDate <= currentDate)
-                    {
-                        HttpResponseMessage response = await client.GetAsync($"{url}{iteratorDate.ToString("dd/MM/yyyy")}");
-                        response.EnsureSuccessStatusCode();
-                        string xmlString = await response.Content.ReadAsStringAsync();
-                        xmlStringList.Add(xmlString);
-                        Console.WriteLine($"Загружена информация о валютных котировках по дате: {iteratorDate}");
-                        iteratorDate = iteratorDate.AddDays(1);
-                    }
+                    HttpResponseMessage response = await client.GetAsync($"{url}{date.ToString("dd/MM/yyyy")}");
+                    response.EnsureSuccessStatusCode();
+                    xmlString = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Загружена информация о валютных котировках по дате: {date}");
                 }
                 catch (HttpRequestException e)
                 {
-                    Console.WriteLine($"Ошибка при выполнении запроса: {e.Message}"); 
+                    Console.WriteLine($"Ошибка при выполнении запроса: {e.Message}");
+                    throw e;
                 }
             }
-
-            List<CurrencyValueByDateListDTO> currencyValueByDateListDTOs = new List<CurrencyValueByDateListDTO>();
-
-            foreach (var xmlString in xmlStringList)
-            {
-                currencyValueByDateListDTOs.Add(XmlParseHelper.ParseXmlCurrencyValueByDateToDTO(xmlString));
-            }
-
-            return new CurrencyValuesByDatesListDTO(currencyValueByDateListDTOs);
+            return XmlParseHelper.ParseXmlCurrencyQuotesByDateToDTO(xmlString);
         }
-
 
         /// <summary>
         /// Асинхронный метод получения массива json с котировками валют по датам
@@ -100,7 +81,7 @@ namespace Crawler.Core.BusinessLogics.Services
         /// <param name="url_info">URl.</param>
         /// <param name="url_values">URl.</param>
         /// <returns></returns>
-        public static async Task<string> GetCurrencyInfosInJsobAsync(
+        public static async Task<string> GetCurrencyInfosInJsonAsync(
             DateOnly? fromDate,
             string url_info = "http://cbr.ru/scripts/XML_valFull.asp",
             string url_values = "http://cbr.ru/scripts/XML_daily.asp?date_req=")
@@ -114,7 +95,6 @@ namespace Crawler.Core.BusinessLogics.Services
                     HttpResponseMessage response = await client.GetAsync(url_info);
                     response.EnsureSuccessStatusCode();
                     xmlStringInfo = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Загружена справочная информация о валютах");
 
                     DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
                     if (fromDate == null)

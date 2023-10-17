@@ -1,33 +1,33 @@
 ﻿namespace Storage.Core.BusinessLogics.BindingModels
 {
     /// <summary>
-    /// Значение валюты по дате.
+    /// Значение валюты к другой валюте по дате.
     /// </summary>
-    public abstract class CurrencyValueByDateBindingModel
+    public class CurrencyValueByDateBindingModel
     {
         /// <summary>
         /// ID.
         /// </summary>
-        public virtual int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// ID Базовой валюты.
         /// </summary>
-        public virtual int BaseCurrencyId { get; set; }
+        public int BaseCurrencyId { get; set; }
 
         /// <summary>
-        /// ID Валюты.
+        /// ID другой валюты.
         /// </summary>
-        public virtual int CurrencyId { get; set; }
+        public int CurrencyId { get; set; }
 
         /// <summary>
         /// Дата.
         /// </summary>
-        public virtual DateOnly Date { get; set; }
+        public DateOnly Date { get; set; }
 
         /// <summary>
         /// Значение курса валют на дату.
         /// </summary>
-        public virtual decimal Value { get; set; }
+        public decimal Value { get; set; }
     }
 }

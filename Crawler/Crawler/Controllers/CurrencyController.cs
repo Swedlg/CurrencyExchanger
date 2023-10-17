@@ -18,7 +18,7 @@ namespace Crawler.Main.Controllers
         [Route("get-currencies")]
         public async Task<IActionResult> GetCurrenciesInJsonArray()
         {
-            var json = await GetCurranciesService.GetCurrencyInfosInJsobAsync(null);
+            var json = await GetCurranciesService.GetCurrencyInfosInJsonAsync(null);
             return Ok(json);
         }
 
@@ -30,7 +30,7 @@ namespace Crawler.Main.Controllers
         [Route("get-currencies-by-date")]
         public async Task<IActionResult> GetCurrenciesInJsonArray(DateTime date)
         {
-            var json = await GetCurranciesService.GetCurrencyInfosInJsobAsync(DateOnly.FromDateTime(date));
+            var json = await GetCurranciesService.GetCurrencyInfosInJsonAsync(DateOnly.FromDateTime(date));
             return Ok(json);
         }
     }

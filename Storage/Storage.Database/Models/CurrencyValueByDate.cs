@@ -1,21 +1,22 @@
-﻿using Storage.Core.BusinessLogics.BindingModels;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Storage.Database.Models
 {
     /// <summary>
-    /// Значение валюты по дате.
+    /// Значение валюты к другой валюте по дате.
     /// </summary>
-    public class CurrencyValueByDate : CurrencyValueByDateBindingModel
+    [Table("currencyvaluebydates")]
+    public class CurrencyValueByDate
     {
         /// <summary>
         /// ID.
         /// </summary>
-        public override int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// ID Базовой валюты.
         /// </summary>
-        public override int BaseCurrencyId { get; set; }
+        public int BaseCurrencyId { get; set; }
 
         /// <summary>
         /// Базовая валюта.
@@ -23,23 +24,23 @@ namespace Storage.Database.Models
         public CurrencyInfo BaseCurrency { get; set; } // (Вторичный ключ).
 
         /// <summary>
-        /// ID Валюты.
+        /// ID Другой валюты.
         /// </summary>
-        public override int CurrencyId { get; set; }
+        public int CurrencyId { get; set; }
 
         /// <summary>
-        /// Валюта.
+        /// Другая валюта.
         /// </summary>
         public CurrencyInfo Currency { get; set; } // (Вторичный ключ).
 
         /// <summary>
         /// Дата.
         /// </summary>
-        public override DateOnly Date { get; set; } // DateOnly (.NET) -> date (PostgreSQL)
+        public DateOnly Date { get; set; } // DateOnly (.NET) -> date (PostgreSQL)
 
         /// <summary>
         /// Значение курса валют на дату.
         /// </summary>
-        public override decimal Value { get; set; } // decimal (.NET) -> numeric (PostgreSQL)
+        public decimal Value { get; set; } // decimal (.NET) -> numeric (PostgreSQL)
     }
 }

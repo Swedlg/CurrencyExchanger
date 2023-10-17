@@ -1,39 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Storage.Core.BusinessLogics.BindingModels
+﻿namespace Storage.Core.BusinessLogics.BindingModels
 {
     /// <summary>
     /// Справочная информация о валюте.
     /// </summary>
-    public abstract class CurrencyInfoBindingModel
+    public class CurrencyInfoBindingModel
     {
         /// <summary>
         /// ID.
         /// </summary>
-        public virtual int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
-        /// Название валюты по русски.
+        /// Название валюты на русском.
         /// </summary>
-        public virtual string Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Название валюты по английски.
+        /// Название валюты на английском.
         /// </summary>
-        public virtual string EngName { get; set; }
+        public string EngName { get; set; }
 
         /// <summary>
         /// Код родительской или базовой валюты.
         /// </summary>
-        public virtual string RId { get; set; }
+        public string RId { get; set; }
 
         /// <summary>
-        /// Код валюты.
+        /// Символьный код валюты.
         /// </summary>
-        public virtual string ISOCharCode { get; set; }
+        public string ISOCharCode { get; set; }
     }
 }
