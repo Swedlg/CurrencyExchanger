@@ -1,5 +1,5 @@
-﻿using Crawler.Core.BusinessLogics.BindingModels;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Crawler.Database.Models
 {
@@ -7,6 +7,7 @@ namespace Crawler.Database.Models
     /// Последняя дата загрузки.
     /// </summary>
     [Index(nameof(Date))]
+    [Table("uploaddates")]
     public class UploadDate
     {
         /// <summary>

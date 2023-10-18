@@ -18,15 +18,10 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.1-dev-00320" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00968" />
+    <PackageReference Include="Swedlg.CurrencyExchanger.ExchangeData" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Converter.Core\Converter.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ExchangeData">
-      <HintPath>..\..\ExchangeData\ExchangeData\bin\Debug\net6.0\ExchangeData.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

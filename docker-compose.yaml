@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+
+  postgres_crawler:
+    container_name: postgres_crawler
+    image: postgres:14.8
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=CurrencyNotificationServiceDb
+    ports:
+      - 5442:5432
+    networks:
+      - mynetwork
+
+  postgres_storage:
+    container_name: postgres_storage
+    image: postgres:14.8
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=CurrencyStorageDb
+    ports:
+      - 5452:5432
+    networks:
+      - mynetwork
+
+  crawler:
+    build: 
+      context: ./Crawler
+      dockerfile: Dockerfile
+    ports: 
+        - "7049:7049"
+    depends_on:
+     - postgres_crawler
+     - rabbitmq
+    networks:
+      - mynetwork
+
+  converter:
+    build: 
+      context: ./Converter
+      dockerfile: Dockerfile
+    depends_on:
+     - rabbitmq
+    networks:
+      - mynetwork
+
+  storage:
+    build: 
+      context: ./Storage
+      dockerfile: Dockerfile
+    ports: 
+      - "7036:7036"
+    depends_on:
+     - postgres_storage
+     - rabbitmq
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

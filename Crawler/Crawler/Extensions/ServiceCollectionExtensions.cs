@@ -2,6 +2,7 @@
 using Crawler.Database;
 using Crawler.Database.Repositories;
 using Hangfire;
+using Hangfire.PostgreSql;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -21,19 +22,36 @@ namespace Crawler.Main.Extensions
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddControllers();
-           
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            services.AddHangfire(x => x.UseSqlServerStorage(
-                configuration.GetConnectionString("CurrencyNotificationConnectionDbStringMSSQL")));
+            /*
+            services.AddDbContext<CurrencyUploadsDatesDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
+            */
 
             services.AddDbContext<CurrencyUploadsDatesDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringMSSQL")));
+                options.UseNpgsql(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
 
-            services.AddScoped<IUploadDateRepository, UploadDateRepository>();
+            /*
+            services.AddHangfire(x => x.UseSqlServerStorage(
+                configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
+            */
+
+            services.AddHangfire(config =>
+                config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(c =>
+                {
+                    c.UseNpgsqlConnection(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres"));
+                }));
 
             services.AddHangfireServer();
+
+            services.AddScoped<IUploadDateRepository, UploadDateRepository>();
 
             services.AddMassTransit(busConfigurator =>
             {
@@ -57,20 +75,6 @@ namespace Crawler.Main.Extensions
                     busFactoryConfigurator.ConfigureEndpoints(context);
                 });
             });
-
-
-
-
-            /*
-            var rabbitSection = configuration.GetSection("RabbitServer");
-            var serviceSection = configuration.GetSection("ServiceInfo");
-
-            ConfigureServicesMassTransit.ConfigureServices(services, configuration, new MassTransitConfiguration
-            {
-                IsDebug = rabbitSection.GetValue<bool>("IsDebug"),
-                ServiceName = serviceSection.GetValue<string>("ServiceName"), 
-            });
-            */
         }
     }
 }

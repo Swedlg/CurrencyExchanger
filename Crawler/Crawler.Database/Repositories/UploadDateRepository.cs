@@ -93,7 +93,7 @@ namespace Crawler.Database.Repositories
         /// <returns>Удалось ли очистить хранилище от дынных.</returns>
         public async Task<bool> Truncate()
         {
-            _context.Database.ExecuteSql($"TRUNCATE TABLE UploadDates");
+            _context.Database.ExecuteSql($"TRUNCATE TABLE uploaddates");
             return true;
         }
 

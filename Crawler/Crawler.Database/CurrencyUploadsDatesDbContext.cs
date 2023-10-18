@@ -22,7 +22,7 @@ namespace Crawler.Database
             base.OnConfiguring(optionsBuilder);
 
             // Поддержка DateOnly типов (зависимость ErikEJ.EntityFrameworkCore.SqlServer.DateOnlyTimeOnly подключена именно для этого)
-            optionsBuilder.UseSqlServer(x => x.UseDateOnlyTimeOnly()); 
+            //optionsBuilder.UseNpgsql(x => x.UseDateOnlyTimeOnly()); // Только для MSSQL
         }
 
         /// <summary>

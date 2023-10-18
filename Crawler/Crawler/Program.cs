@@ -18,7 +18,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseHangfireDashboard("/dashboard");
+app.UseHangfireDashboard("/dashboard", new DashboardOptions()
+{
+    Authorization = new[] { new AllowAllConnectionsFilter() },
+    IgnoreAntiforgeryToken = true
+});
 
 app.MapControllers();
 

@@ -3,6 +3,10 @@ using ExchangeData.DTOModels;
 using ExchangeData.DTOModels.CrawlerToConvert;
 using ExchangeData.DTOModels.CrawlerToStorage;
 using Newtonsoft.Json;
+using System;
+using System.Data.SqlTypes;
+using System.Text;
+using System.Text.Unicode;
 
 namespace Crawler.Core.BusinessLogics.Services
 {
@@ -33,9 +37,9 @@ namespace Crawler.Core.BusinessLogics.Services
             {
                 try
                 {
-                    HttpResponseMessage response = await client.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    xmlString = await response.Content.ReadAsStringAsync();
+                    var bytes = await client.GetByteArrayAsync(url);
+                    Encoding encoding = Encoding.GetEncoding("UTF-8");
+                    xmlString = encoding.GetString(bytes, 0, bytes.Length);
                     Console.WriteLine($"Загружена справочная информация о валютах");
                 }
                 catch (HttpRequestException e)
@@ -60,9 +64,9 @@ namespace Crawler.Core.BusinessLogics.Services
             {
                 try
                 {
-                    HttpResponseMessage response = await client.GetAsync($"{url}{date.ToString("dd/MM/yyyy")}");
-                    response.EnsureSuccessStatusCode();
-                    xmlString = await response.Content.ReadAsStringAsync();
+                    var bytes = await client.GetByteArrayAsync($"{url}{date.ToString("dd/MM/yyyy")}");
+                    Encoding encoding = Encoding.GetEncoding("UTF-8");
+                    xmlString = encoding.GetString(bytes, 0, bytes.Length);
                     Console.WriteLine($"Загружена информация о валютных котировках по дате: {date}");
                 }
                 catch (HttpRequestException e)
@@ -92,9 +96,10 @@ namespace Crawler.Core.BusinessLogics.Services
             {
                 try
                 {
-                    HttpResponseMessage response = await client.GetAsync(url_info);
-                    response.EnsureSuccessStatusCode();
-                    xmlStringInfo = await response.Content.ReadAsStringAsync();
+                    var bytes = await client.GetByteArrayAsync(url_info);
+                    Encoding encoding = Encoding.GetEncoding("UTF-8");
+                    xmlStringInfo = encoding.GetString(bytes, 0, bytes.Length);
+                    Console.WriteLine($"Загружена справочная информация о валютах");
 
                     DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
                     if (fromDate == null)
@@ -105,9 +110,8 @@ namespace Crawler.Core.BusinessLogics.Services
                     DateOnly iteratorDate = (DateOnly)fromDate;
                     while (iteratorDate <= currentDate)
                     {
-                        response = await client.GetAsync($"{url_values}{iteratorDate.ToString("dd/MM/yyyy")}");
-                        response.EnsureSuccessStatusCode();
-                        string xmlString = await response.Content.ReadAsStringAsync();
+                        var bytesCurrencyValues = await client.GetByteArrayAsync($"{url_values}{iteratorDate.ToString("dd/MM/yyyy")}");
+                        var xmlString = encoding.GetString(bytesCurrencyValues, 0, bytesCurrencyValues.Length);
                         xmlStringValuesList.Add(xmlString);
                         Console.WriteLine($"Загружена информация о валютных котировках по дате: {iteratorDate}");
                         iteratorDate = iteratorDate.AddDays(1);
