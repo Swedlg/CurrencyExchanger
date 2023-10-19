@@ -8,11 +8,11 @@
         /// <summary>
         /// ID.
         /// </summary>
-        public virtual int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Дата зугрузки информации о валютах.
         /// </summary>
-        public virtual DateOnly UploadDate { get; set; }
+        public DateOnly UploadDate { get; set; }
     }
 }

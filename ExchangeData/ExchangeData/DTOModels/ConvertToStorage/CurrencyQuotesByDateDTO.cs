@@ -6,29 +6,14 @@
     public class CurrencyQuotesByDateDTO
     {
         /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="baseCurrencyId">RId Базовой валюты.</param>
-        /// <param name="currencyId">RId Другой валюты.</param>
-        /// <param name="date">Дата.</param>
-        /// <param name="value">Значение котировки.</param>
-        public CurrencyQuotesByDateDTO(string baseCurrencyId, string currencyId, DateTime date, decimal value)
-        {
-            BaseCurrencyId = baseCurrencyId;
-            CurrencyId = currencyId;
-            Date = date;
-            Value = value;
-        }
-
-        /// <summary>
         /// RId Базовой валюты.
         /// </summary>
-        public string BaseCurrencyId { get; set; }
+        public string BaseCurrencyId { get; set; } = String.Empty;
 
         /// <summary>
         /// RId Другой валюты.
         /// </summary>
-        public string CurrencyId { get; set; }
+        public string CurrencyId { get; set; } = String.Empty;
 
         /// <summary>
         /// Дата.

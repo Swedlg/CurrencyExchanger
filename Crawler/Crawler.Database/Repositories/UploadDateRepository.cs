@@ -84,14 +84,14 @@ namespace Crawler.Database.Repositories
         public async Task<bool> SaveAsync()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
         /// <summary>
         /// Очистить хранилище от данных.
         /// </summary>
         /// <returns>Удалось ли очистить хранилище от дынных.</returns>
-        public async Task<bool> Truncate()
+        public bool Truncate()
         {
             _context.Database.ExecuteSql($"TRUNCATE TABLE uploaddates");
             return true;
@@ -112,7 +112,7 @@ namespace Crawler.Database.Repositories
         /// </summary>
         /// <param name="bindingModel">Binding модель даты загрузки.</param>
         /// <returns>Db модель даты загрузки.</returns>
-        private UploadDate ParseToDbModel(UploadDateBindingModel bindingModel)
+        private static UploadDate ParseToDbModel(UploadDateBindingModel bindingModel)
         {
             return new UploadDate
             {

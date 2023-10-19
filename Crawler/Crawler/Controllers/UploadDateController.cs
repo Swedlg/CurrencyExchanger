@@ -20,6 +20,11 @@ namespace Crawler.Main.Controllers
         /// </summary>
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="latestUploadDateRepository">Хранилище дат последних загрузок.</param>
         public UploadDateController(
             ILogger<HangfireJobController> logger,
             IUploadDateRepository latestUploadDateRepository)
@@ -37,7 +42,7 @@ namespace Crawler.Main.Controllers
         public async Task<IActionResult> Truncate()
         {
             _logger.LogInformation("Вызывается метод очистки хранилища дат последних загрузок.");
-            bool truncated = await _latestUploadDateRepository.Truncate();
+            bool truncated = _latestUploadDateRepository.Truncate();
             if (truncated)
             {
                 _logger.LogInformation("Хранилище дат последних загрузок очищено.");

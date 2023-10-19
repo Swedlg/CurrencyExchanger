@@ -16,15 +16,17 @@ namespace Converter.Core.BusinessLogics.Services
         /// <returns>Список всех валют относительно друг друга по дате</returns>
         public static CurrencyQuotesByDateListDTO ConvertToCurrencyQuotesByDateListDTO(List<RubleQuoteDTO> list, DateTime date)
         {
-            List<CurrencyQuotesByDateDTO> listOfcurrencyQuotesByDateDTO = new List<CurrencyQuotesByDateDTO>();
+            List<CurrencyQuotesByDateDTO> listOfcurrencyQuotesByDateDTO = new();
 
             foreach (RubleQuoteDTO rubleQuoteDTO in list)
             {
-                listOfcurrencyQuotesByDateDTO.Add(new CurrencyQuotesByDateDTO(
-                                                        rubleQuoteDTO.BaseCurrencyId,
-                                                        rubleQuoteDTO.CurrencyId,
-                                                        date,
-                                                        rubleQuoteDTO.Value));
+                listOfcurrencyQuotesByDateDTO.Add(new CurrencyQuotesByDateDTO()
+                {
+                    BaseCurrencyId = rubleQuoteDTO.BaseCurrencyId,
+                    CurrencyId = rubleQuoteDTO.CurrencyId,
+                    Date = date,
+                    Value = rubleQuoteDTO.Value,
+                });
             }
 
             foreach (RubleQuoteDTO rubleQuoteDTO1 in list)
@@ -33,16 +35,18 @@ namespace Converter.Core.BusinessLogics.Services
                 {
                     if (rubleQuoteDTO1.CurrencyId != rubleQuoteDTO2.CurrencyId)
                     {
-                        listOfcurrencyQuotesByDateDTO.Add(new CurrencyQuotesByDateDTO(
-                            rubleQuoteDTO1.CurrencyId,
-                            rubleQuoteDTO2.CurrencyId,
-                            date,
-                            rubleQuoteDTO2.Value / rubleQuoteDTO1.Value));
+                        listOfcurrencyQuotesByDateDTO.Add(new CurrencyQuotesByDateDTO()
+                        {
+                            BaseCurrencyId = rubleQuoteDTO1.BaseCurrencyId,
+                            CurrencyId = rubleQuoteDTO2.CurrencyId,
+                            Date = date,
+                            Value = rubleQuoteDTO2.Value / rubleQuoteDTO1.Value,
+                        });
                     }
                 }
             }
 
-            return new CurrencyQuotesByDateListDTO(listOfcurrencyQuotesByDateDTO);
+            return new CurrencyQuotesByDateListDTO() { List = listOfcurrencyQuotesByDateDTO };
         }
     }
 }

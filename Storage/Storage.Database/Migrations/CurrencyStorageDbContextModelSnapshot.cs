@@ -48,7 +48,7 @@ namespace Storage.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("СurrencyInfos");
+                    b.ToTable("currencyinfos");
                 });
 
             modelBuilder.Entity("Storage.Database.Models.CurrencyValueByDate", b =>
@@ -77,7 +77,7 @@ namespace Storage.Database.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("CurrencyValueByDates");
+                    b.ToTable("currencyvaluebydates");
                 });
 
             modelBuilder.Entity("Storage.Database.Models.CurrencyValueByDate", b =>

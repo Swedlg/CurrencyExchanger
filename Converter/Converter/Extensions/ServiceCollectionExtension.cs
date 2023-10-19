@@ -1,4 +1,5 @@
-﻿using Converter.Main.Consumers;
+﻿using Converter.Main.ConfigModels;
+using Converter.Main.Consumers;
 using MassTransit;
 
 namespace Converter.Main.Extensions
@@ -19,19 +20,14 @@ namespace Converter.Main.Extensions
             {
                 busConfigurator.AddConsumer<RubleQuotesByDateConsumer>();
 
-                var rabbitSection = configuration.GetSection("RabbitServer");
-
-                string url = rabbitSection.GetValue<string>("Url");
-                string host = rabbitSection.GetValue<string>("Host");
-                string user = rabbitSection.GetValue<string>("User");
-                string password = rabbitSection.GetValue<string>("Password");
+                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{url}/{host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
                     {
-                        cfg.Username("currency-exchanger-guest");
-                        cfg.Password("currency-exchanger-guest");
+                        cfg.Username(rabbitConfig.User);
+                        cfg.Password(rabbitConfig.Password);
                     });
 
                     busFactoryConfigurator.ConfigureEndpoints(context);

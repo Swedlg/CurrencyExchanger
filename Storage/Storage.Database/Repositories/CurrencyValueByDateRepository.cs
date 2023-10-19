@@ -89,7 +89,7 @@ namespace Storage.Database.Repositories
         /// <param name="BaseRId">RId базовой валюты.</param>
         /// <param name="OtherRId">RId другой валюты.</param>
         /// <returns>Список информации о валютных котировках с фильтрацией по диапазону дат и кодам валют.</returns>
-        public async Task<ICollection<CurrencyValueByDateBindingModel>> GetFilteredAsync(DateOnly? dateFrom, DateOnly? dateTo, string BaseRId, string OtherRId)
+        public async Task<ICollection<CurrencyValueByDateBindingModel>> GetFilteredAsync(DateOnly? dateFrom, DateOnly? dateTo, string BaseRId, string? OtherRId)
         {
             if (dateFrom == null || dateTo == null)
             {
@@ -150,7 +150,7 @@ namespace Storage.Database.Repositories
         public async Task<bool> SaveAsync()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Storage.Database.Repositories
         /// </summary>
         /// <param name="bindingModel">Binding модель котировки валюты.</param>
         /// <returns>Db модель котировки валюты.</returns>
-        private CurrencyValueByDate ParseToDbModel(CurrencyValueByDateBindingModel bindingModel)
+        private static CurrencyValueByDate ParseToDbModel(CurrencyValueByDateBindingModel bindingModel)
         {
             return new CurrencyValueByDate
             {

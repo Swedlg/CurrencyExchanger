@@ -6,6 +6,10 @@ using Hangfire.PostgreSql;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Crawler.Core.BusinessLogics;
+using Crawler.Core.BusinessLogics.Services;
+using Crawler.Core.BusinessLogics.Helpers;
+using Crawler.Main.CongifModels;
 
 namespace Crawler.Main.Extensions
 {
@@ -26,18 +30,19 @@ namespace Crawler.Main.Extensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            /*
-            services.AddDbContext<CurrencyUploadsDatesDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
-            */
+            services.AddAutoMapper(c =>
+            {
+                c.AddProfile<AutoMapperProfile>();
+            });
+
+            services.AddScoped<GetCurranciesService>();
+            services.AddScoped<XmlParseHelper>();
+            services.AddScoped<JsonParseHelper>();
+
+            services.AddHttpClient();
 
             services.AddDbContext<CurrencyUploadsDatesDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
-
-            /*
-            services.AddHangfire(x => x.UseSqlServerStorage(
-                configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres")));
-            */
+                options.UseNpgsql(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres")));
 
             services.AddHangfire(config =>
                 config
@@ -46,7 +51,7 @@ namespace Crawler.Main.Extensions
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(c =>
                 {
-                    c.UseNpgsqlConnection(configuration.GetConnectionString("CurrencyNotificationConnectionDbStringPostgres"));
+                    c.UseNpgsqlConnection(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres"));
                 }));
 
             services.AddHangfireServer();
@@ -57,19 +62,14 @@ namespace Crawler.Main.Extensions
             {
                 busConfigurator.AddConsumers(Assembly.GetExecutingAssembly());
 
-                var rabbitSection = configuration.GetSection("RabbitServer");
-
-                string url = rabbitSection.GetValue<string>("Url");
-                string host = rabbitSection.GetValue<string>("Host");
-                string user = rabbitSection.GetValue<string>("User");
-                string password = rabbitSection.GetValue<string>("Password");
+                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{url}/{host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
                     {
-                        cfg.Username("currency-exchanger-guest");
-                        cfg.Password("currency-exchanger-guest");
+                        cfg.Username(rabbitConfig.User);
+                        cfg.Password(rabbitConfig.Password);
                     });
 
                     busFactoryConfigurator.ConfigureEndpoints(context);

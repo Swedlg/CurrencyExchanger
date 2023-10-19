@@ -17,21 +17,21 @@ namespace Storage.Database.Models
         /// <summary>
         /// Название валюты по русски.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
         /// <summary>
         /// Название валюты по английски.
         /// </summary>
-        public string EngName { get; set; }
+        public string EngName { get; set; } = String.Empty;
 
         /// <summary>
         /// Код родительской или базовой валюты.
         /// </summary>
-        public string RId { get; set; }
+        public string RId { get; set; } = String.Empty;
 
         /// <summary>
         /// Символьный код валюты.
         /// </summary>
-        public string ISOCharCode { get; set; }
+        public string ISOCharCode { get; set; } = String.Empty;
     }
 }

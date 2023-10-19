@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Storage.Core.BusinessLogics.Interfaces;
 using Storage.Database;
 using Storage.Database.Repositories;
+using Storage.Main.ConfigModels;
 using Storage.Main.Consumers;
 
 namespace Storage.Main.Extensions
@@ -27,7 +28,7 @@ namespace Storage.Main.Extensions
             services.AddLogging();
 
             services.AddDbContext<CurrencyStorageDbContext>(options =>
-                        options.UseNpgsql(configuration.GetConnectionString("CurrencyStorageConnectionDbString")));
+                        options.UseNpgsql(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString")));
 
             services.AddScoped<ICurrencyInfoRepository, CurrencyInfoRepository>();
             services.AddScoped<ICurrencyValueByDateRepository, CurrencyValueByDateRepository>();
@@ -38,19 +39,14 @@ namespace Storage.Main.Extensions
                 busConfigurator.AddConsumer<CurrencyInfoCostumer>();
                 busConfigurator.AddConsumer<CurrencyValueByDateConsumer>();
 
-                var rabbitSection = configuration.GetSection("RabbitServer");
-
-                string url = rabbitSection.GetValue<string>("Url");
-                string host = rabbitSection.GetValue<string>("Host");
-                string user = rabbitSection.GetValue<string>("User");
-                string password = rabbitSection.GetValue<string>("Password");
+                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{url}/{host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
                     {
-                        cfg.Username("currency-exchanger-guest");
-                        cfg.Password("currency-exchanger-guest");
+                        cfg.Username(rabbitConfig.User);
+                        cfg.Password(rabbitConfig.Password);
                     });
 
                     busFactoryConfigurator.ConfigureEndpoints(context);

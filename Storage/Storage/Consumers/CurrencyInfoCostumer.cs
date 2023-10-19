@@ -40,7 +40,7 @@ namespace Storage.Main.Consumers
         /// <returns>:)</returns>
         public async Task Consume(ConsumeContext<CurrencyInfoListDTO> context)
         {
-            _logger.LogInformation($"Получен новый объект DTO: {typeof(CurrencyInfoListDTO).Name}.");
+            _logger.LogInformation("Получен новый объект DTO: {typeof(CurrencyInfoListDTO).Name}.", typeof(CurrencyInfoListDTO).Name);
             CurrencyInfoListDTO value = context.Message;
 
             foreach (var item in value.List)

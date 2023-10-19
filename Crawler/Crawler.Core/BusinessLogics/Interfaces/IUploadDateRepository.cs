@@ -50,6 +50,6 @@ namespace Crawler.Core.BusinessLogics.Interfaces
         /// Очистить хранилище от данных.
         /// </summary>
         /// <returns>Удалось ли очистить хранилище от данных.</returns>
-        Task<bool> Truncate();
+        bool Truncate();
     }
 }

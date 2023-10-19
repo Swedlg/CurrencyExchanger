@@ -100,7 +100,7 @@ namespace Storage.Database.Repositories
         public async Task<bool> SaveAsync()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Storage.Database.Repositories
         /// </summary>
         /// <param name="bindingModel">Binding модель справочной информации о валюте.</param>
         /// <returns>Db модель справочной информации о валюте.</returns>
-        private CurrencyInfo ParseToDbModel(CurrencyInfoBindingModel bindingModel)
+        private static CurrencyInfo ParseToDbModel(CurrencyInfoBindingModel bindingModel)
         {
             return new CurrencyInfo
             {

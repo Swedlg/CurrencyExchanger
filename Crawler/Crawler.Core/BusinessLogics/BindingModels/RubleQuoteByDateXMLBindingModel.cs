@@ -1,48 +1,52 @@
-﻿namespace Crawler.Core.BindingModels
+﻿using System.Xml.Serialization;
+
+namespace Crawler.Core.BindingModels
 {
     /// <summary>
     /// Модель информации о валютной котировке относительно рубля.
     /// </summary>
-    public class RubleQuoteByDateBindingModel
+    public class RubleQuoteByDateXMLBindingModel
     {
         /// <summary>
         /// ID.
         /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Дата.
-        /// </summary>
-        public DateOnly Date {  get; set; }
+        [XmlAttribute("ID")]
+        public string Id { get; set; } = String.Empty;
 
         /// <summary>
         /// Цифровой код валюты.
         /// </summary>
-        public string NumCode { get; set; }
+        [XmlElement("NumCode")]
+        public string NumCode { get; set; } = String.Empty;
 
         /// <summary>
         /// Символьный код валюты.
         /// </summary>
-        public string CharCode { get; set; }
+        [XmlElement("CharCode")]
+        public string CharCode { get; set; } = String.Empty;
 
         /// <summary>
         /// Номинал валюты.
         /// </summary>
-        public string Nominal { get; set; }
+        [XmlElement("Nominal")]
+        public string Nominal { get; set; } = String.Empty;
 
         /// <summary>
         /// Название валюты на русском.
         /// </summary>
-        public string Name { get; set; }
+        [XmlElement("Name")]
+        public string Name { get; set; } = String.Empty;
 
         /// <summary>
         /// Значение стоимости валюты.
         /// </summary>
-        public string Value { get; set; }
+        [XmlElement("Value")]
+        public string Value { get; set; } = String.Empty;
 
         /// <summary>
         /// Значение стоимости валюты соотносительно с номиналом.
         /// </summary>
-        public string VunitRate { get; set; }
+        [XmlElement("VunitRate")]
+        public string VunitRate { get; set; } = String.Empty;
     }
 }

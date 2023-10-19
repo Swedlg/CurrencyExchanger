@@ -21,7 +21,7 @@ namespace Storage.Database.Models
         /// <summary>
         /// Базовая валюта.
         /// </summary>
-        public CurrencyInfo BaseCurrency { get; set; } // (Вторичный ключ).
+        public CurrencyInfo BaseCurrency { get; set; } = new CurrencyInfo(); // (Вторичный ключ).
 
         /// <summary>
         /// ID Другой валюты.
@@ -31,7 +31,7 @@ namespace Storage.Database.Models
         /// <summary>
         /// Другая валюта.
         /// </summary>
-        public CurrencyInfo Currency { get; set; } // (Вторичный ключ).
+        public CurrencyInfo Currency { get; set; } = new CurrencyInfo(); // (Вторичный ключ).
 
         /// <summary>
         /// Дата.

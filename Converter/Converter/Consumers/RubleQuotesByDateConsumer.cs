@@ -35,10 +35,10 @@ namespace Converter.Main.Consumers
         /// <returns>:)</returns>
         public async Task Consume(ConsumeContext<RubleQuotesByDateDTO> context)
         {
-            _logger.LogInformation($"Получен новый объект DTO: {typeof(RubleQuotesByDateDTO).Name}.");
+            _logger.LogInformation("Получен новый объект DTO: {typeof(RubleQuotesByDateDTO).Name}.", typeof(RubleQuotesByDateDTO).Name);
             CurrencyQuotesByDateListDTO currencyQuotesByDateListDTO = DTOConverter.ConvertToCurrencyQuotesByDateListDTO(context.Message.List, context.Message.Date);
             await _publishEndpoint.Publish(currencyQuotesByDateListDTO);
-            _logger.LogInformation($"Объект {typeof(RubleQuotesByDateDTO).Name} обработан и передан в Storage.");
+            _logger.LogInformation("Объект {typeof(RubleQuotesByDateDTO).Name} обработан и передан в Storage.", typeof(RubleQuotesByDateDTO).Name);
         }
     }
 }

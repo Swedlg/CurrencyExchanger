@@ -38,4 +38,25 @@ DTO модели:
 
 - **CurrencyStorageDb** - База данных для хранения справочной информации о валютах и информации о валютных котировках по датам
 
+Строки подключения к БД и RabbitMQ передаются через окружение. В моем случае это
+
+**Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres**
+
+Host=localhost; Port=5432; Database=CurrencyNotificationServiceDb; Username=swed19; Password=postgres
+
+**Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString**
+
+Host=localhost; Port=5432; Database=CurrencyStorageDb; Username=swed19; Password=postgres
+
+**Swedlg_CurrencyExchanger_RabbitServer**
+
+{
+    "RabbitServer":
+    {
+        "Url": "localhost",
+        "Host": "currency-exchanger",
+        "User": "currency-exchanger-guest", "Password": "currency-exchanger-guest"
+    }
+}
+
 P.S. в папке rabbitmq мои неудачные попытки создать докер контейнер с преднастроенной конфигурацией RabbitMQ. Тоесть автоматическое создание пользователя и виртуального хоста на RabbitMQ.
