@@ -22,6 +22,8 @@ namespace Converter.Main.Extensions
 
                 var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
 
+                Console.WriteLine($"{rabbitConfig.Url} {rabbitConfig.Host} {rabbitConfig.User} {rabbitConfig.Password}");
+
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
                     busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
