@@ -6,6 +6,8 @@ builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
+app.Configure(builder.Configuration);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

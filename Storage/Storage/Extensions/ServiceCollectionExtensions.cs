@@ -35,7 +35,6 @@ namespace Storage.Main.Extensions
 
             services.AddMassTransit(busConfigurator =>
             {
-                //busConfigurator.AddConsumers(Assembly.GetExecutingAssembly());
                 busConfigurator.AddConsumer<CurrencyInfoCostumer>();
                 busConfigurator.AddConsumer<CurrencyValueByDateConsumer>();
 

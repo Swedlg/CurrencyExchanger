@@ -8,6 +8,8 @@ builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
+app.Configure(builder.Configuration);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -23,6 +25,7 @@ app.UseHangfireDashboard("/dashboard", new DashboardOptions()
     Authorization = new[] { new AllowAllConnectionsFilter() },
     IgnoreAntiforgeryToken = true
 });
+
 app.MapControllers();
 
 RecurringJob.AddOrUpdate("Daily Currencies Notification", () => (new GetCurranciesService()).RequestCurrencyInfosAsync(), "0 0 * * *");
