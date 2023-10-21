@@ -58,3 +58,5 @@ Host=localhost; Port=5432; Database=CurrencyStorageDb; Username=swed19; Password
         "User": "currency-exchanger-guest", "Password": "currency-exchanger-guest"
     }
 }
+
+P.S. При попытке подключиться к RabbitMQ контейнеру через браузер (например по http://localhost:15672/#/users) может ничего не произойти. У меня всегда работает с Firefox, но с Chrome срабатывает почему-то через раз. Возможно вам нужно будет сделать жесткую перезагрузку страницы.
