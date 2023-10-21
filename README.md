@@ -58,5 +58,3 @@ Host=localhost; Port=5432; Database=CurrencyStorageDb; Username=swed19; Password
         "User": "currency-exchanger-guest", "Password": "currency-exchanger-guest"
     }
 }
-
-P.S. в папке rabbitmq мои неудачные попытки создать докер контейнер с преднастроенной конфигурацией RabbitMQ. Тоесть автоматическое создание пользователя и виртуального хоста на RabbitMQ.
