@@ -39,7 +39,7 @@ namespace Crawler.Main.Controllers
         /// <returns>Результат операции.</returns>
         [HttpDelete]
         [Route("truncate")]
-        public async Task<IActionResult> Truncate()
+        public IActionResult Truncate()
         {
             _logger.LogInformation("Вызывается метод очистки хранилища дат последних загрузок.");
             bool truncated = _latestUploadDateRepository.Truncate();

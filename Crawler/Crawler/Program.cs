@@ -4,11 +4,11 @@ using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureServices(builder.Configuration);
+builder.Services.ConfigureServices();
 
 var app = builder.Build();
 
-app.Configure(builder.Configuration);
+app.Configure();
 
 if (app.Environment.IsDevelopment())
 {
