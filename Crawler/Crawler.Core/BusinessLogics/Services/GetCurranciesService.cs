@@ -62,10 +62,6 @@ namespace Crawler.Core.BusinessLogics.Services
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        public GetCurranciesService()
-        {
-        }
-
         /// <summary>
         /// Метод получения DTO объектов c информацией о валютах и их котировках, и их отправки через RabbitMQ + MassTransit.
         /// </summary>

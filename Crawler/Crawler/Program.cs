@@ -1,8 +1,6 @@
 using Crawler.Core.BusinessLogics.Services;
 using Crawler.Main.Extensions;
 using Hangfire;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
