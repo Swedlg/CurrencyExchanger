@@ -18,7 +18,7 @@ namespace Storage.Main.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов в контейнере DI.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+        public static void ConfigureServices(this IServiceCollection services)
         {
             services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

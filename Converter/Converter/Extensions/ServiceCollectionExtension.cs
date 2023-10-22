@@ -14,7 +14,7 @@ namespace Converter.Main.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов в контейнере DI.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        internal static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+        internal static void ConfigureServices(this IServiceCollection services)
         {
             services.AddMassTransit(busConfigurator =>
             {

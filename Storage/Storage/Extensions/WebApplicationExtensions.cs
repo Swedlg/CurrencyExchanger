@@ -13,14 +13,12 @@ namespace Storage.Main.Extensions
         /// </summary>
         /// <param name="app">Настраиваемое веб-прилоежние.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        public static void Configure(this WebApplication app, IConfiguration configuration)
+        public static void Configure(this WebApplication app)
         {
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<CurrencyStorageDbContext>();
-                context.Database.Migrate();
-            }
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<CurrencyStorageDbContext>();
+            context.Database.Migrate();
         }
     }
 }

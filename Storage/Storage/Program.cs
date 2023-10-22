@@ -2,11 +2,11 @@ using Storage.Main.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureServices(builder.Configuration);
+builder.Services.ConfigureServices();
 
 var app = builder.Build();
 
-app.Configure(builder.Configuration);
+app.Configure();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
