@@ -38,25 +38,40 @@ DTO модели:
 
 - **CurrencyStorageDb** - База данных для хранения справочной информации о валютах и информации о валютных котировках по датам
 
-Строки подключения к БД и RabbitMQ передаются через окружение. В моем случае это
+Строки подключения к БД и RabbitMQ передаются через окружение. Их можно посмотреть в docker-compose файле.
 
-**Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres**
+При создании котнейнеров я использую один контейнер Postgres для создания обеих БД.
 
-Host=localhost; Port=5432; Database=CurrencyNotificationServiceDb; Username=swed19; Password=postgres
+Для отправки запросов через Postman можно использовать следующие команды:
+<font color="#808080">(:exclamation: Пока только по HTTP)</font>
 
-**Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString**
+1) POST Для создания **единичной** задачи, получения справочной информации о валютах и валютных котировках по датам с последующей отправкой в Storage или Converter соответсвенно:
+<font color="#808080">(:exclamation: При повторном создании задачи убедитесь, что таблица в бд с датами загрузок очищена п.3.)</font>
+http://localhost:7049/api/hangfirejob/get-currencies-fire-and-forget
 
-Host=localhost; Port=5432; Database=CurrencyStorageDb; Username=swed19; Password=postgres
+2) POST Для создания **повторяющейся** задачи, получения справочной информации о валютах и валютных котировках по датам с последующей отправкой в Storage или Converter соответсвенно:
+<font color="#808080">(:exclamation: При повторном создании задачи убедитесь, что таблица в бд с датами загрузок очищена п.3.)</font>
+http://localhost:7049/api/hangfirejob/get-currencies-recurring
 
-**Swedlg_CurrencyExchanger_RabbitServer**
+3) DELETE Для очистки таблицы БД от информации о последних датах загрузки:
+http://localhost:7049/api/UploadDate/truncate
 
-{
-    "RabbitServer":
-    {
-        "Url": "localhost",
-        "Host": "currency-exchanger",
-        "User": "currency-exchanger-guest", "Password": "currency-exchanger-guest"
-    }
-}
+4) GET Для получения напрямую в формате JSON справочной информации о валютах:
+http://localhost:7049/api/currency/get-currencies
+
+5) GET Для получения напрямую в формате JSON информации о валютных котировках по датe:
+http://localhost:7049/api/currency/get-currencies-by-date?date=2023-09-30
+
+6) GET Для получения из Storage справочной информации о валютах.
+http://localhost:7036/api/Currency/get-currencies-infos
+
+7) GET Для получения из Storage выборки по диапазону дат и вылютам:
+http://localhost:7036/api/Currency/get-currencies-values?dateFrom=2023-09-30&dateTo=2023-10-30&baseRId=R00000&otherRid
+
+8) DELETE Для очистки в БД таблицы со справочной информацией о валютах:
+https://localhost:7036/api/Currency/truncate-currency-infos-db
+
+9) FELETE Для очистки в БД таблицы с информацией о валютных котировках по датам:
+https://localhost:7036/api/Currency/truncate-currency-values-db
 
 P.S. При попытке подключиться к RabbitMQ контейнеру через браузер (например по http://localhost:15672/#/users) может ничего не произойти. У меня всегда работает с Firefox, но с Chrome срабатывает почему-то через раз. Возможно вам нужно будет сделать жесткую перезагрузку страницы.
