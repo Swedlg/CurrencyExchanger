@@ -7,7 +7,7 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-
+    /*
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
@@ -18,6 +18,6 @@
       "publishAllPorts": false,
       "useSSL": false
     }
-  
+    */
   }
 }

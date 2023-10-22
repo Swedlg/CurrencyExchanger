@@ -27,6 +27,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+/*
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
@@ -36,5 +37,6 @@
       },
       "useSSL": false
     }
+  */
   }
 }
