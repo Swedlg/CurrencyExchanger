@@ -56,6 +56,8 @@ namespace Crawler.Main.Extensions
 
             services.AddHangfireServer();
 
+            
+
             services.AddScoped<IUploadDateRepository, UploadDateRepository>();
 
             services.AddMassTransit(busConfigurator =>

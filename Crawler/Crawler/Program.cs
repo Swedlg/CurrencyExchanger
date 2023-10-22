@@ -1,6 +1,8 @@
 using Crawler.Core.BusinessLogics.Services;
 using Crawler.Main.Extensions;
 using Hangfire;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,6 @@ app.UseHangfireDashboard("/dashboard", new DashboardOptions()
 
 app.MapControllers();
 
-RecurringJob.AddOrUpdate("Daily Currencies Notification", () => (new GetCurranciesService()).RequestCurrencyInfosAsync(), "0 0 * * *");
+RecurringJob.AddOrUpdate<GetCurranciesService>("Daily Currencies Notification", job => job.RequestCurrencyInfosAsync(), "0 0 * * *");
 
 app.Run();
