@@ -26,6 +26,7 @@ services:
     environment:
       - POSTGRES_USER=swed19
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=CurrencyStorageDb
     ports:
       - 5442:5432
     networks:
@@ -41,7 +42,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Test
       # - ASPNETCORE_URLS=https://+:443;http://+:80
-      - Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres=Host=postgres_db;Port=5442;Database=CurrencyNotificationServiceDb;Username=swed19;Password=postgres
+      - Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres=Host=postgres_db;Port=5432;Database=CurrencyNotificationServiceDb;Username=swed19;Password=postgres
       - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"currency-exchanger","User":"currency-exchanger-guest","Password":"currency-exchanger-guest"}}
       # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"/","User":"guest","Password":"guest"}}
     ports:
@@ -75,7 +76,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Test
       # - ASPNETCORE_URLS=https://+:443;http://+:80
-      - Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString=Host=postgres_db;Port=5442;Database=CurrencyStorageDb;Username=swed19;Password=postgres
+      - Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString=Host=postgres_db;Port=5432;Database=CurrencyStorageDb;Username=swed19;Password=postgres
       - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"currency-exchanger","User":"currency-exchanger-guest","Password":"currency-exchanger-guest"}}
       # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"/","User":"guest","Password":"guest"}}
     ports: 

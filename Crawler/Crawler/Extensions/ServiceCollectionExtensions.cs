@@ -1,4 +1,4 @@
-﻿using Crawler.Core.BusinessLogics.Interfaces;
+﻿ using Crawler.Core.BusinessLogics.Interfaces;
 using Crawler.Database;
 using Crawler.Database.Repositories;
 using Hangfire;
@@ -75,6 +75,8 @@ namespace Crawler.Main.Extensions
                         cfg.Username(rabbitConfig.User);
                         cfg.Password(rabbitConfig.Password);
                     });
+
+
 
                     busFactoryConfigurator.ConfigureEndpoints(context);
                 });
