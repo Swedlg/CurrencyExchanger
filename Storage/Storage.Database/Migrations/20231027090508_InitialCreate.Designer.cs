@@ -12,8 +12,8 @@ using Storage.Database;
 namespace Storage.Database.Migrations
 {
     [DbContext(typeof(CurrencyStorageDbContext))]
-    [Migration("20231019195707_NullableTest")]
-    partial class NullableTest
+    [Migration("20231027090508_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,4 +1,5 @@
-﻿using Crawler.Core.BusinessLogics.BindingModels;
+﻿using AutoMapper;
+using Crawler.Core.BusinessLogics.BindingModels;
 using Crawler.Core.BusinessLogics.Helpers;
 using Crawler.Core.BusinessLogics.Interfaces;
 using ExchangeData.DTOModels.CrawlerToConvert;
@@ -15,9 +16,9 @@ namespace Crawler.Core.BusinessLogics.Services
     public class GetCurranciesService
     {
         /// <summary>
-        /// Парсер XML.
+        /// Маппер.
         /// </summary>
-        private readonly XmlParseHelper _xmlParseHelper;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Опредедитель Endpoint'ов для MassTransit и RabbitMQ
@@ -42,19 +43,19 @@ namespace Crawler.Core.BusinessLogics.Services
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="xmlParseHelper"></param>
+        /// <param name="mapper">Маппер.</param>
         /// <param name="publishEndpoint"></param>
         /// <param name="logger"></param>
         /// <param name="latestUploadDateRepository"></param>
         /// <param name="httpClient"></param>
         public GetCurranciesService(
-            XmlParseHelper xmlParseHelper,
+            IMapper mapper,
             IPublishEndpoint publishEndpoint,
             ILogger<GetCurranciesService> logger,
             IUploadDateRepository latestUploadDateRepository,
             HttpClient httpClient)
         {
-            _xmlParseHelper = xmlParseHelper;
+            _mapper = mapper;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
             _latestUploadDateRepository = latestUploadDateRepository;
@@ -80,15 +81,13 @@ namespace Crawler.Core.BusinessLogics.Services
             }
 
             #endregion
-
-            #region Получение информации о котировках валют относительно рубля и отправка соответсвующего DTO в Converter
-
+     
             UploadDateBindingModel? latestUploadDate = await _latestUploadDateRepository.GetUploadDateAsync();
 
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
 
             //DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddYears(-2);  : latestUploadDate.UploadDate;
-            DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddMonths(-1) : latestUploadDate.UploadDate;
+            DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddDays(-5) : latestUploadDate.UploadDate;
 
             if (iteratorDate < currentDate)
             {
@@ -119,9 +118,11 @@ namespace Crawler.Core.BusinessLogics.Services
             else
             {
                 _logger.LogInformation("Данные по котировкам валют уже были загружены сегодня.");
-            }
+            }         
 
-            #endregion
+            
+
+            
         }
 
         /// <summary>
@@ -160,7 +161,7 @@ namespace Crawler.Core.BusinessLogics.Services
                 throw e;
             }
 
-            return _xmlParseHelper.ParseXmlCurrencyInfoToDTO(xmlString);
+            return ConvertXmlCurrencyInfoToDTO(xmlString);
         }
 
         /// <summary>
@@ -184,18 +185,18 @@ namespace Crawler.Core.BusinessLogics.Services
                 Console.WriteLine($"Ошибка при выполнении запроса: {e.Message}");
                 throw e;
             }
-            return _xmlParseHelper.ParseXmlCurrencyQuotesByDateToDTO(xmlString);
+            return ConvertXmlCurrencyQuotesByDateToDTO(xmlString);
         }
 
         /// <summary>
         /// Асинхронный метод получения массива json с котировками валют по датам
         /// </summary>
-        /// <param name="fromDate">Дата.</param>
+        /// <param name="exactlyDate">Дата.</param>
         /// <param name="url_info">URl.</param>
         /// <param name="url_values">URl.</param>
         /// <returns></returns>
         public async Task<string> GetCurrencyInfosInJsonAsync(
-            DateOnly? fromDate,
+            DateOnly? exactlyDate,
             string url_info = "http://cbr.ru/scripts/XML_valFull.asp",
             string url_values = "http://cbr.ru/scripts/XML_daily.asp?date_req=")
         {
@@ -210,12 +211,12 @@ namespace Crawler.Core.BusinessLogics.Services
                 Console.WriteLine($"Загружена справочная информация о валютах");
 
                 DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
-                if (fromDate == null)
+                if (exactlyDate == null)
                 {
-                    fromDate = currentDate.AddYears(-2);
+                    exactlyDate = currentDate.AddYears(-2);
                 }
 
-                DateOnly iteratorDate = (DateOnly)fromDate;
+                DateOnly iteratorDate = (DateOnly)exactlyDate;
                 while (iteratorDate <= currentDate)
                 {
                     var bytesCurrencyValues = await _httpClient.GetByteArrayAsync($"{url_values}{iteratorDate:dd/MM/yyyy}");
@@ -230,7 +231,150 @@ namespace Crawler.Core.BusinessLogics.Services
                 Console.WriteLine($"Ошибка при выполнении запроса: {e.Message}");
             }
 
-            return JsonParseHelper.ParseCurrencyInfoToJson(xmlStringInfo, xmlStringValuesList);
+            #region Парсим строки XML в BindingModel'и
+
+            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlStringInfo);
+
+            List<ValCursListXMLBindingModel> valCursListXMLBindingModels = new();
+
+            foreach (var str in xmlStringValuesList)
+            {
+                var newListValue = XmlParseHelper<ValCursListXMLBindingModel>.Parse(str);
+                if (newListValue != null)
+                {
+                    valCursListXMLBindingModels.Add(newListValue);
+                }
+            }
+
+            #endregion
+
+            #region Парсим BindingModel'и в нужный Json формат
+
+            var result = BindingModelConverter.ParseCurrencyInfoToJson(valutaListXMLBindingModel, valCursListXMLBindingModels);
+
+            #endregion
+
+            return result;
+        }
+
+        /// <summary>
+        /// Асинхронный метод получения массива json с котировками валют по определенной дате
+        /// </summary>
+        /// <param name="exactlyDate">Дата.</param>
+        /// <param name="url_info">URl.</param>
+        /// <param name="url_values">URl.</param>
+        /// <returns></returns>
+        public async Task<string> GetCurrencyValueByExactlyDateInJsonAsync(
+            DateOnly exactlyDate,
+            string url_info = "http://cbr.ru/scripts/XML_valFull.asp",
+            string url_values = "http://cbr.ru/scripts/XML_daily.asp?date_req=")
+        {
+            string xmlStringInfo = String.Empty;
+            List<string> xmlStringValuesList = new();
+
+            try
+            {
+                var bytes = await _httpClient.GetByteArrayAsync(url_info);
+                Encoding encoding = Encoding.GetEncoding("windows-1251");
+                xmlStringInfo = encoding.GetString(bytes, 0, bytes.Length);
+                Console.WriteLine($"Загружена справочная информация о валютах");
+
+                var bytesCurrencyValues = await _httpClient.GetByteArrayAsync($"{url_values}{exactlyDate:dd/MM/yyyy}");
+                var xmlString = encoding.GetString(bytesCurrencyValues, 0, bytesCurrencyValues.Length);
+                xmlStringValuesList.Add(xmlString);
+                Console.WriteLine($"Загружена информация о валютных котировках по дате: {exactlyDate}");
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Ошибка при выполнении запроса: {e.Message}");
+            }
+
+            #region Парсим строки XML в BindingModel'и
+
+            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlStringInfo);
+
+            List<ValCursListXMLBindingModel> valCursListXMLBindingModels = new();
+
+            foreach (var str in xmlStringValuesList)
+            {
+                var newListValue = XmlParseHelper<ValCursListXMLBindingModel>.Parse(str);
+                if (newListValue != null)
+                {
+                    valCursListXMLBindingModels.Add(newListValue);
+                }
+            }
+
+            #endregion
+
+            #region Парсим BindingModel'и в нужный Json формат
+
+            var result = BindingModelConverter.ParseCurrencyInfoToJson(valutaListXMLBindingModel, valCursListXMLBindingModels);
+
+            #endregion
+
+            return result;
+        }
+
+        /// <summary>
+        /// Запарсить строку в список справочной информации о валютах.
+        /// </summary>
+        /// <param name="xmlString">XML строка.</param>
+        /// <returns>Объект CurrencyInfoListDTO.</returns>
+        public CurrencyInfoListDTO ConvertXmlCurrencyInfoToDTO(string xmlString)
+        {
+            List<CurrencyInfoDTO> itemList = new()
+            {
+                new CurrencyInfoDTO()
+                {
+                    RId = "R00000", // ( Я не знаю настоящий RId для рубля )
+                    Name = "Рубль",
+                    EngName = "Ruble",
+                    ParentRId = "R00000",
+                    ISOCharCode = "RUB"
+                }
+            };
+
+            ValutaListXMLBindingModel? currencyData = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlString);
+
+            List<CurrencyInfoDTO>? valuteInfoList = currencyData?.Items?.Select(valuteInfo => _mapper.Map<CurrencyInfoDTO>(valuteInfo)).ToList();
+
+            if (valuteInfoList != null)
+            {
+                itemList.AddRange(valuteInfoList);
+            }
+
+            return new CurrencyInfoListDTO() { List = itemList ?? new List<CurrencyInfoDTO>() };
+        }
+
+
+        /// <summary>
+        /// Запарсить строку в список информации о валютных котировках по датам.
+        /// </summary>
+        /// <param name="xmlString">XML строка.</param>
+        /// <returns>Объект CurrencyValueByDateListDTO.</returns>
+        public RubleQuotesByDateDTO ConvertXmlCurrencyQuotesByDateToDTO(string xmlString)
+        {
+            List<RubleQuoteDTO> itemList = new();
+
+            ValCursListXMLBindingModel? currencyData = XmlParseHelper<ValCursListXMLBindingModel>.Parse(xmlString);
+
+            List<RubleQuoteDTO>? currencyValuesList = currencyData?.Valutes?.Select(valuteValue => _mapper.Map<RubleQuoteDTO>(valuteValue)).ToList();
+
+            if (currencyValuesList != null)
+            {
+                foreach (var valuteValue in currencyValuesList)
+                {
+                    valuteValue.BaseCurrencyId = "R00000";
+                }
+
+                itemList.AddRange(currencyValuesList);
+            }
+
+            return new RubleQuotesByDateDTO
+            {
+                Date = DateTime.ParseExact(currencyData?.Date ?? "01.01.0001", "dd.MM.yyyy", null),
+                List = itemList
+            };
         }
     }
 }

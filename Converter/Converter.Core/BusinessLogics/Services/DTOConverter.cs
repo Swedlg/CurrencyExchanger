@@ -37,7 +37,7 @@ namespace Converter.Core.BusinessLogics.Services
                     {
                         listOfcurrencyQuotesByDateDTO.Add(new CurrencyQuotesByDateDTO()
                         {
-                            BaseCurrencyId = rubleQuoteDTO1.BaseCurrencyId,
+                            BaseCurrencyId = rubleQuoteDTO1.CurrencyId,
                             CurrencyId = rubleQuoteDTO2.CurrencyId,
                             Date = date,
                             Value = rubleQuoteDTO2.Value / rubleQuoteDTO1.Value,

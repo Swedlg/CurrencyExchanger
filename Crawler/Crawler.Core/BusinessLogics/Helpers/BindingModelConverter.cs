@@ -1,44 +1,23 @@
 ﻿using Crawler.Core.BindingModels;
 using Crawler.Core.BusinessLogics.BindingModels;
 using Newtonsoft.Json;
-using System.Xml.Serialization;
 
 namespace Crawler.Core.BusinessLogics.Helpers
 {
     /// <summary>
-    /// Парсер Json.
+    /// Конвертер  BindingModel'ей в различные форматы.
     /// </summary>
-    public class JsonParseHelper
+    public class BindingModelConverter
     {
         /// <summary>
-        /// Запарсить XML строки справочной информации о валютах и информации о котировках валют в выборку в формате Json.
+        /// Запарсить BindingModel'и со справочной информацией о валютах и 
+        /// информацию о котировках валют по датам в строку Json.
         /// </summary>
-        /// <param name="xmlStringInfo">XML строка информаций о валютах.</param>
-        /// <param name="xmlStringValuesList">Список XML строк информации о котировках валют.</param>
+        /// <param name="valutaListXMLBindingModel"></param>
+        /// <param name="valCursListXMLBindingModels"></param>
         /// <returns>Строка Json представляющая выборку данных о котировках валют по датам.</returns>
-        internal static string ParseCurrencyInfoToJson(string xmlStringInfo, List<string> xmlStringValuesList)
+        internal static string ParseCurrencyInfoToJson(ValutaListXMLBindingModel? valutaListXMLBindingModel, List<ValCursListXMLBindingModel> valCursListXMLBindingModels)
         {
-            XmlSerializer serializer = new(typeof(ValutaListXMLBindingModel));
-            ValutaListXMLBindingModel? valutaListXMLBindingModel;
-
-            using (var reader = new StringReader(xmlStringInfo))
-            {
-                valutaListXMLBindingModel = (ValutaListXMLBindingModel?)serializer.Deserialize(reader);
-            }
-
-            serializer = new XmlSerializer(typeof(ValCursListXMLBindingModel));
-            List<ValCursListXMLBindingModel> valCursListXMLBindingModels = new();
-
-            foreach (var str in xmlStringValuesList)
-            {
-                using var reader = new StringReader(str);
-                var currencyValueData = (ValCursListXMLBindingModel?)serializer.Deserialize(reader);
-                if (currencyValueData != null)
-                {
-                    valCursListXMLBindingModels.Add(currencyValueData);
-                }
-            }
-
             List<JsonCurrencyByDateDTO> jsonCurrencyByDateDTOs = new();
 
             foreach (var dateValues in valCursListXMLBindingModels)

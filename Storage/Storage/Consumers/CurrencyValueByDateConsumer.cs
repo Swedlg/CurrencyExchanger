@@ -58,18 +58,19 @@ namespace Storage.Main.Consumers
 
                 if (!isExist)
                 {
-                    CurrencyInfoBindingModel? baseId = await _currencyInfoRepository.GetCurrencyInfoByRIdAsync(item.BaseCurrencyId);
-                    CurrencyInfoBindingModel? otherId = await _currencyInfoRepository.GetCurrencyInfoByRIdAsync(item.CurrencyId);
+                    CurrencyInfoBindingModel? baseValute = await _currencyInfoRepository.GetCurrencyInfoByRIdAsync(item.BaseCurrencyId);
+                    CurrencyInfoBindingModel? otherValute = await _currencyInfoRepository.GetCurrencyInfoByRIdAsync(item.CurrencyId);
 
-                    if (baseId != null && otherId != null)
+                    if (baseValute != null && otherValute != null)
                     {
                         await _currencyValueByDateRepository.CreateCurrencyValueByDateAsync(new CurrencyValueByDateBindingModel
                         {
                             Date = DateOnly.FromDateTime(item.Date),
-                            BaseCurrencyId = baseId.Id,
-                            CurrencyId = otherId.Id,
+                            BaseCurrencyId = baseValute.Id,
+                            CurrencyId = otherValute.Id,
                             Value = item.Value,
                         });
+
                         _logger.LogInformation($"В БД добавлена новая запись.");
                     }
                 }

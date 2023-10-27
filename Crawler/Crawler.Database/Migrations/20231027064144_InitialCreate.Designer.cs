@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Crawler.Database.Migrations
 {
     [DbContext(typeof(CurrencyUploadsDatesDbContext))]
-    [Migration("20231018063608_InitialCreate")]
+    [Migration("20231027064144_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
