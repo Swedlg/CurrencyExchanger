@@ -62,11 +62,7 @@ namespace Crawler.Main.Extensions
 
             services.AddMassTransit(busConfigurator =>
             {
-                //busConfigurator.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("dev", true));
-
                 busConfigurator.AddConsumers(Assembly.GetExecutingAssembly());
-
-               
 
                 var rabbitMQOptions = new RabbitMQConfigModel();
                 conf.GetSection(RabbitMQConfigModel.RabbitMQ).Bind(rabbitMQOptions);
@@ -80,20 +76,6 @@ namespace Crawler.Main.Extensions
                         cfg.Username(rabbitMQOptions.RabbitUser);
                         cfg.Password(rabbitMQOptions.RabbitPassword);
                     });
-
-                    /*
-                    busFactoryConfigurator.Publish<RubleQuotesByDateDTO>(x => {
-                        x.Durable = true;
-                        x.AutoDelete = true;
-                        x.ExchangeType = "fanout";
-                    });
-
-                    busFactoryConfigurator.Publish<CurrencyInfoListDTO>(x => {
-                        x.Durable = true;
-                        x.AutoDelete = true;
-                        x.ExchangeType = "fanout";
-                    });
-                    */
                     
                     busFactoryConfigurator.ConfigureEndpoints(context);
                 });

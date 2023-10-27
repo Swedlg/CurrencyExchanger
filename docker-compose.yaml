@@ -4,16 +4,6 @@ services:
   rabbitmq:
     image: "rabbitmq:3.10.6-management-alpine"
     container_name: rabbitmq
-    # volumes:
-      # - type: bind
-      #   source: ./rabbitmq/rabbitmq-enabled-plugins
-      #   target: /etc/rabbitmq/enabled_plugins
-      # - type: bind
-      #   source: ./rabbitmq/rabbitmq.config
-      #   target: /etc/rabbitmq/rabbitmq.conf
-      # - type: bind
-      #   source: ./rabbitmq/rabbitmq-defs.json
-      #   target: /etc/rabbitmq/definitions.json
     ports:
       - 5672:5672
       - 15672:15672
@@ -41,10 +31,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE__ENVIRONMENT=Test
-      # - ASPNETCORE_URLS=https://+:443;http://+:80
       - Swedlg_CurrencyExchanger_CurrencyNotificationConnectionDbStringPostgres=Host=postgres_db;Port=5432;Database=CurrencyNotificationServiceDb;Username=swed19;Password=postgres
-      # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"currency-exchanger","User":"currency-exchanger-guest","Password":"currency-exchanger-guest"}}
-      # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"/","User":"guest","Password":"guest"}}
       - RabbitMQ__RabbitUrl=rabbitmq
       - RabbitMQ__RabbitHost=/
       - RabbitMQ__RabbitUser=guest
@@ -64,9 +51,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE__ENVIRONMENT=Test
-      # - ASPNETCORE_URLS=https://+:443;http://+:80
       - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"currency-exchanger","User":"currency-exchanger-guest","Password":"currency-exchanger-guest"}}
-      # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"/","User":"guest","Password":"guest"}}
       - RabbitMQ__RabbitUrl=rabbitmq
       - RabbitMQ__RabbitHost=/
       - RabbitMQ__RabbitUser=guest
@@ -83,10 +68,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE__ENVIRONMENT=Test
-      # - ASPNETCORE_URLS=https://+:443;http://+:80
       - Swedlg_CurrencyExchanger_CurrencyStorageConnectionDbString=Host=postgres_db;Port=5432;Database=CurrencyStorageDb;Username=swed19;Password=postgres
-      # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"currency-exchanger","User":"currency-exchanger-guest","Password":"currency-exchanger-guest"}}
-      # - Swedlg_CurrencyExchanger_RabbitServer={"RabbitServer":{ "Url":"rabbitmq","Host":"/","User":"guest","Password":"guest"}}
       - RabbitMQ__RabbitUrl=rabbitmq
       - RabbitMQ__RabbitHost=/
       - RabbitMQ__RabbitUser=guest
