@@ -119,10 +119,6 @@ namespace Crawler.Core.BusinessLogics.Services
             {
                 _logger.LogInformation("Данные по котировкам валют уже были загружены сегодня.");
             }         
-
-            
-
-            
         }
 
         /// <summary>
