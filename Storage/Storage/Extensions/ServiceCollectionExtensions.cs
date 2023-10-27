@@ -22,7 +22,6 @@ namespace Storage.Main.Extensions
         public static void ConfigureServices(this IServiceCollection services, ConfigurationManager conf)
         {
             services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
