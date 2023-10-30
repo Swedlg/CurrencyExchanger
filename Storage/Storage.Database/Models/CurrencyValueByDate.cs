@@ -16,22 +16,22 @@ namespace Storage.Database.Models
         /// <summary>
         /// ID Базовой валюты.
         /// </summary>
-        public int BaseCurrencyId { get; set; }
+        //public int BaseCurrencyId { get; set; }
 
         /// <summary>
         /// Базовая валюта.
         /// </summary>
-        public CurrencyInfo BaseCurrency { get; set; } = new CurrencyInfo(); // (Вторичный ключ).
+        public CurrencyInfo BaseCurrency { get; set; } = null!;
 
         /// <summary>
         /// ID Другой валюты.
         /// </summary>
-        public int CurrencyId { get; set; }
+        //public int CurrencyId { get; set; }
 
         /// <summary>
         /// Другая валюта.
         /// </summary>
-        public CurrencyInfo Currency { get; set; } = new CurrencyInfo(); // (Вторичный ключ).
+        public CurrencyInfo Currency { get; set; } = null!;
 
         /// <summary>
         /// Дата.

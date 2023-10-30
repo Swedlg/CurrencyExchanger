@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Storage.Core.BusinessLogics.BindingModels;
 using Storage.Core.BusinessLogics.Interfaces;
+using System.Text.Json;
 
 namespace Storage.Controllers
 {
@@ -52,12 +53,20 @@ namespace Storage.Controllers
             string? otherRid)
         {
             _logger.LogInformation("Вызывается метод получения информации валютных котировках с фильтрацией по диапозону даи и кодам валют.");
-            var json = await _currencyValueByDateRepository.GetFilteredAsync(
+            List<CurrencyValueByDateBindingModel> list = ( await _currencyValueByDateRepository.GetFilteredAsync(
                 dateFrom.HasValue ? DateOnly.FromDateTime((DateTime)dateFrom) : null,
                 dateTo.HasValue ? DateOnly.FromDateTime((DateTime)dateTo) : null,
                 baseRId,
-                string.IsNullOrWhiteSpace(otherRid) ? null : otherRid);
-            return Ok(json);
+                string.IsNullOrWhiteSpace(otherRid) ? null : otherRid)).ToList();
+
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            string jsonString = JsonSerializer.Serialize(list, options);
+
+            return Ok(jsonString);
         }
 
         /// <summary>

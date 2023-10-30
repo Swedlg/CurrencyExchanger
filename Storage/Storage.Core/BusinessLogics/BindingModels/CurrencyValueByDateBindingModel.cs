@@ -3,6 +3,7 @@
     /// <summary>
     /// Значение валюты к другой валюте по дате.
     /// </summary>
+    [Serializable]
     public class CurrencyValueByDateBindingModel
     {
         /// <summary>

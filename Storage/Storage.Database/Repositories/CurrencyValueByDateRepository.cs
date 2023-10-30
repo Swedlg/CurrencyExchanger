@@ -2,6 +2,7 @@
 using Storage.Core.BusinessLogics.BindingModels;
 using Storage.Core.BusinessLogics.Interfaces;
 using Storage.Database.Models;
+using System.Security.Cryptography;
 
 namespace Storage.Database.Repositories
 {
@@ -31,7 +32,7 @@ namespace Storage.Database.Repositories
         /// <returns>Удалось ли создать запись.</returns>
         public async Task<bool> CreateCurrencyValueByDateAsync(CurrencyValueByDateBindingModel item)
         {
-            _context.Add(ParseToDbModel(item));
+            _context.CurrencyValueByDates.Add(ParseToDbModel(item));
             return await SaveAsync();
         }
 
@@ -73,8 +74,8 @@ namespace Storage.Database.Repositories
                 .Select(c => new CurrencyValueByDateBindingModel
                 {
                     Id = c.Id,
-                    BaseCurrencyId = c.BaseCurrencyId,
-                    CurrencyId = c.CurrencyId,
+                    BaseCurrencyId = c.BaseCurrency.Id,
+                    CurrencyId = c.Currency.Id,
                     Date = c.Date,
                     Value = c.Value
                 })
@@ -100,8 +101,8 @@ namespace Storage.Database.Repositories
                         .Select(c => new CurrencyValueByDateBindingModel
                         {
                             Id = c.Id,
-                            BaseCurrencyId = c.BaseCurrencyId,
-                            CurrencyId = c.CurrencyId,
+                            BaseCurrencyId = c.BaseCurrency.Id,
+                            CurrencyId = c.Currency.Id,
                             Date = c.Date,
                             Value = c.Value
                         })
@@ -112,13 +113,13 @@ namespace Storage.Database.Repositories
             {
                 if (!string.IsNullOrWhiteSpace(OtherRId))
                 {
-                    return (ICollection<CurrencyValueByDateBindingModel>)await _context.CurrencyValueByDates
+                    return await _context.CurrencyValueByDates
                         .Where(c => c.BaseCurrency.RId == BaseRId && c.Currency.RId == OtherRId && c.Date > dateFrom && c.Date < dateTo)
                         .Select(c => new CurrencyValueByDateBindingModel
                         {
                             Id = c.Id,
-                            BaseCurrencyId = c.BaseCurrencyId,
-                            CurrencyId = c.CurrencyId,
+                            BaseCurrencyId = c.BaseCurrency.Id,
+                            CurrencyId = c.Currency.Id,
                             Date = c.Date,
                             Value = c.Value
                         })
@@ -126,13 +127,13 @@ namespace Storage.Database.Repositories
                 }
                 else
                 {
-                    return (ICollection<CurrencyValueByDateBindingModel>)await _context.CurrencyValueByDates
+                    return await _context.CurrencyValueByDates
                         .Where(c => c.BaseCurrency.RId == BaseRId && c.Date > dateFrom && c.Date < dateTo)
                         .Select(c => new CurrencyValueByDateBindingModel
                         {
                             Id = c.Id,
-                            BaseCurrencyId = c.BaseCurrencyId,
-                            CurrencyId = c.CurrencyId,
+                            BaseCurrencyId = c.BaseCurrency.Id,
+                            CurrencyId = c.Currency.Id,
                             Date = c.Date,
                             Value = c.Value
                         })
@@ -159,7 +160,7 @@ namespace Storage.Database.Repositories
         /// <returns>Удалось ли очистить таблицу с информацией о валютных котировках.</returns>
         public async Task<bool> Truncate()
         {
-            await _context.Database.ExecuteSqlAsync($"TRUNCATE TABLE currencyvaluebydates");
+            await _context.Database.ExecuteSqlAsync($"TRUNCATE TABLE currencyvaluebydates CASCADE");
             return true;
         }
 
@@ -168,13 +169,18 @@ namespace Storage.Database.Repositories
         /// </summary>
         /// <param name="bindingModel">Binding модель котировки валюты.</param>
         /// <returns>Db модель котировки валюты.</returns>
-        private static CurrencyValueByDate ParseToDbModel(CurrencyValueByDateBindingModel bindingModel)
+        private CurrencyValueByDate ParseToDbModel(CurrencyValueByDateBindingModel bindingModel)
         {
             return new CurrencyValueByDate
             {
-                Id = bindingModel.Id,
-                BaseCurrencyId = bindingModel.BaseCurrencyId,
-                CurrencyId = bindingModel.CurrencyId,
+                BaseCurrency = _context.СurrencyInfos
+                .Where(c => c.Id == bindingModel.BaseCurrencyId)
+                .FirstOrDefault() ?? throw new Exception("Нет такой валюты"),
+                
+                Currency = _context.СurrencyInfos
+                .Where(c => c.Id == bindingModel.CurrencyId)
+                .FirstOrDefault() ?? throw new Exception("Нет такой валюты"),
+
                 Date = bindingModel.Date,
                 Value = bindingModel.Value,
             };

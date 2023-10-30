@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Definition;
 using Microsoft.EntityFrameworkCore;
 using Storage.Core.BusinessLogics.Interfaces;
 using Storage.Database;
@@ -18,10 +19,9 @@ namespace Storage.Main.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов в контейнере DI.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services, ConfigurationManager conf)
         {
             services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
@@ -36,18 +36,20 @@ namespace Storage.Main.Extensions
             services.AddMassTransit(busConfigurator =>
             {
                 busConfigurator.AddConsumer<CurrencyInfoCostumer>();
+
                 busConfigurator.AddConsumer<CurrencyValueByDateConsumer>();
 
-                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
+                var rabbitMQOptions = new RabbitMQConfigModel();
+                conf.GetSection(RabbitMQConfigModel.RabbitMQ).Bind(rabbitMQOptions);
 
-                Console.WriteLine($"{rabbitConfig.Url} {rabbitConfig.Host} {rabbitConfig.User} {rabbitConfig.Password}");
+                services.Configure<RabbitMQConfigModel>(conf.GetSection(RabbitMQConfigModel.RabbitMQ));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitMQOptions.RabbitUrl}/{rabbitMQOptions.RabbitHost}", cfg =>
                     {
-                        cfg.Username(rabbitConfig.User);
-                        cfg.Password(rabbitConfig.Password);
+                        cfg.Username(rabbitMQOptions.RabbitUser);
+                        cfg.Password(rabbitMQOptions.RabbitPassword);
                     });
 
                     busFactoryConfigurator.ConfigureEndpoints(context);

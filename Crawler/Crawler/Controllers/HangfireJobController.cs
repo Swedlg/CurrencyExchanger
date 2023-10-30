@@ -32,6 +32,19 @@ namespace Crawler.Main.Controllers
         }
 
         /// <summary>
+        /// Создание единичной задачи (Job) получения справочной информации о валютах.
+        /// </summary>
+        /// <returns>Результат операции.</returns>
+        [HttpPost]
+        [Route("send-valuta-infos-only-fire-and-forget")]
+        public IActionResult AddJobGetValutaInfoOnly()
+        {
+            _logger.LogInformation("Добавляем единичную задачу (Job) получения справочной информации о валютах.");
+            BackgroundJob.Enqueue(() => _getCurranciesService.RequestCurrencyInfoOnlyAsync());
+            return Ok("Задача получения справочной информации о валютах добавлена.");
+        }
+
+        /// <summary>
         /// Создание единичной задачи (Job) получения справочной информации о валютах
         /// и валютных котировках по датам.
         /// </summary>

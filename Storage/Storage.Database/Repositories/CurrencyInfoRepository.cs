@@ -81,7 +81,7 @@ namespace Storage.Database.Repositories
         public async Task<CurrencyInfoBindingModel?> GetCurrencyInfoByRIdAsync(string RId)
         {
             return await _context.СurrencyInfos
-                .Where(c => String.Equals(c.RId, RId))
+                .Where(c => string.Equals(c.RId, RId))
                 .Select(c => new CurrencyInfoBindingModel
                 {
                     Id = c.Id,
@@ -109,7 +109,7 @@ namespace Storage.Database.Repositories
         /// <returns>Удалось ли очистить таблицу со справочной информацией о валютах.</returns>
         public async Task<bool> Truncate()
         {
-            await _context.Database.ExecuteSqlAsync($"TRUNCATE currencyinfos CASCADE");
+            await _context.Database.ExecuteSqlAsync($"TRUNCATE TABLE currencyinfos CASCADE");
             return true;
         }
 

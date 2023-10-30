@@ -1,15 +1,20 @@
-﻿ using Crawler.Core.BusinessLogics.Interfaces;
+﻿using Crawler.Core.BusinessLogics;
+using Crawler.Core.BusinessLogics.ConfigModels;
+using Crawler.Core.BusinessLogics.Helpers;
+using Crawler.Core.BusinessLogics.Interfaces;
+using Crawler.Core.BusinessLogics.Services;
 using Crawler.Database;
 using Crawler.Database.Repositories;
+using Crawler.Main.ConfigModels;
+using ExchangeData.DTOModels.CrawlerToConvert;
+using ExchangeData.DTOModels.CrawlerToStorage;
 using Hangfire;
 using Hangfire.PostgreSql;
 using MassTransit;
+using MassTransit.Definition;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using Crawler.Core.BusinessLogics;
-using Crawler.Core.BusinessLogics.Services;
-using Crawler.Core.BusinessLogics.Helpers;
-using Crawler.Main.CongifModels;
 
 namespace Crawler.Main.Extensions
 {
@@ -23,7 +28,7 @@ namespace Crawler.Main.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов в контейнере DI.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services, ConfigurationManager conf)
         {
             services.AddControllers();
 
@@ -36,8 +41,7 @@ namespace Crawler.Main.Extensions
             });
 
             services.AddScoped<GetCurranciesService>();
-            services.AddScoped<XmlParseHelper>();
-            services.AddScoped<JsonParseHelper>();
+            services.AddScoped<BindingModelConverter>();
 
             services.AddHttpClient();
 
@@ -56,28 +60,30 @@ namespace Crawler.Main.Extensions
 
             services.AddHangfireServer();
 
-            
-
             services.AddScoped<IUploadDateRepository, UploadDateRepository>();
+
+            //services.Configure<MySettings>(conf.GetSection(nameof(MySettings)));
+
+            services.ConfigureOptions<MySettingsSetup>();
+
 
             services.AddMassTransit(busConfigurator =>
             {
                 busConfigurator.AddConsumers(Assembly.GetExecutingAssembly());
 
-                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
+                var rabbitMQOptions = new RabbitMQConfigModel();
+                conf.GetSection(RabbitMQConfigModel.RabbitMQ).Bind(rabbitMQOptions);
 
-                Console.WriteLine($"{rabbitConfig.Url} {rabbitConfig.Host} {rabbitConfig.User} {rabbitConfig.Password}");
+                services.Configure<RabbitMQConfigModel>(conf.GetSection(RabbitMQConfigModel.RabbitMQ));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitMQOptions.RabbitUrl}/{rabbitMQOptions.RabbitHost}", cfg =>
                     {
-                        cfg.Username(rabbitConfig.User);
-                        cfg.Password(rabbitConfig.Password);
+                        cfg.Username(rabbitMQOptions.RabbitUser);
+                        cfg.Password(rabbitMQOptions.RabbitPassword);
                     });
-
-
-
+                    
                     busFactoryConfigurator.ConfigureEndpoints(context);
                 });
             });

@@ -1,6 +1,9 @@
 ﻿using Converter.Main.ConfigModels;
 using Converter.Main.Consumers;
+using ExchangeData.DTOModels.ConvertToStorage;
+using ExchangeData.DTOModels.CrawlerToStorage;
 using MassTransit;
+using MassTransit.Definition;
 
 namespace Converter.Main.Extensions
 {
@@ -14,23 +17,41 @@ namespace Converter.Main.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов в контейнере DI.</param>
         /// <param name="configuration">Конфигурация среды.</param>
-        internal static void ConfigureServices(this IServiceCollection services)
+        internal static void ConfigureServices(this IServiceCollection services, ConfigurationManager conf)
         {
             services.AddMassTransit(busConfigurator =>
             {
+                //busConfigurator.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("dev", true));
+
                 busConfigurator.AddConsumer<RubleQuotesByDateConsumer>();
+                /*
+                .Endpoint(e =>
+                {
+                    e.Temporary = true;
+                    e.InstanceId = "1";
+                });
+                */
 
-                var rabbitConfig = RabbitMQConfigModel.GetRabbitMQConfigModel(Environment.GetEnvironmentVariable("Swedlg_CurrencyExchanger_RabbitServer"));
+                var rabbitMQOptions = new RabbitMQConfigModel();
+                conf.GetSection(RabbitMQConfigModel.RabbitMQ).Bind(rabbitMQOptions);
 
-                Console.WriteLine($"{rabbitConfig.Url} {rabbitConfig.Host} {rabbitConfig.User} {rabbitConfig.Password}");
+                services.Configure<RabbitMQConfigModel>(conf.GetSection(RabbitMQConfigModel.RabbitMQ));
 
                 busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    busFactoryConfigurator.Host($"rabbitmq://{rabbitConfig.Url}/{rabbitConfig.Host}", cfg =>
+                    busFactoryConfigurator.Host($"rabbitmq://{rabbitMQOptions.RabbitUrl}/{rabbitMQOptions.RabbitHost}", cfg =>
                     {
-                        cfg.Username(rabbitConfig.User);
-                        cfg.Password(rabbitConfig.Password);
+                        cfg.Username(rabbitMQOptions.RabbitUser);
+                        cfg.Password(rabbitMQOptions.RabbitPassword);
                     });
+
+                    /*
+                    busFactoryConfigurator.Publish<CurrencyQuotesByDateListDTO>(x => {
+                        x.Durable = true;
+                        x.AutoDelete = true;
+                        x.ExchangeType = "fanout";
+                    });
+                    */
 
                     busFactoryConfigurator.ConfigureEndpoints(context);
                 });

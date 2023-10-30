@@ -1,4 +1,5 @@
 ﻿using Crawler.Core.BusinessLogics.Services;
+using Crawler.Main.ConfigModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Crawler.Main.Controllers
@@ -33,6 +34,7 @@ namespace Crawler.Main.Controllers
         public async Task<IActionResult> GetCurrenciesInJsonArray()
         {
             var json = await _getCurranciesService.GetCurrencyInfosInJsonAsync(null);
+
             return Ok(json);
         }
 
@@ -45,6 +47,21 @@ namespace Crawler.Main.Controllers
         public async Task<IActionResult> GetCurrenciesInJsonArray(DateTime date)
         {
             var json = await _getCurranciesService.GetCurrencyInfosInJsonAsync(DateOnly.FromDateTime(date));
+
+            //Console.WriteLine(_rabbit.RabbitUrl);
+
+            return Ok(json);
+        }
+
+        /// <summary>
+        /// Получение информации по определенной дате в формате json
+        /// </summary>
+        /// <returns>Результат операции.</returns>
+        [HttpGet]
+        [Route("get-currencies-exactly-by-date")]
+        public async Task<IActionResult> GetCurrencyValueByExactlyDateInJsonAsync(DateTime date)
+        {
+            var json = await _getCurranciesService.GetCurrencyValueByExactlyDateInJsonAsync(DateOnly.FromDateTime(date));
             return Ok(json);
         }
     }

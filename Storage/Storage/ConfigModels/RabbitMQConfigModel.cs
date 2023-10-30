@@ -1,54 +1,27 @@
-﻿using Newtonsoft.Json;
-
-namespace Storage.Main.ConfigModels
+﻿namespace Storage.Main.ConfigModels
 {
-    /// <summary>
-    /// Модель конфигурации для RabbitMQ
-    /// </summary>
     public class RabbitMQConfigModel
     {
-        #region Значения беруться из переменной среды. Тут указаны просто значения по умолчанию
+        public const string RabbitMQ = "RabbitMQ";
 
         /// <summary>
         /// Url.
         /// </summary>
-        public string Url { get; set; } = "localhost";
+        public string RabbitUrl { get; set; } = String.Empty;
 
         /// <summary>
         /// Виртуальный хост.
         /// </summary>
-        public string Host { get; set; } = "/";
+        public string RabbitHost { get; set; } = String.Empty;
 
         /// <summary>
         /// Пользователь.
         /// </summary>
-        public string User { get; set; } = "guest";
+        public string RabbitUser { get; set; } = String.Empty;
 
         /// <summary>
         /// Пароль.
         /// </summary>
-        public string Password { get; set; } = "guest";
-
-        #endregion
-
-        public static RabbitMQConfigModel GetRabbitMQConfigModel(string? json)
-        {
-            if (json != null)
-            {
-                try
-                {
-                    dynamic? rabbitConfig = JsonConvert.DeserializeObject(json);
-                    if (rabbitConfig != null)
-                    {
-                        return rabbitConfig.RabbitServer.ToObject<RabbitMQConfigModel>() ?? new RabbitMQConfigModel();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            return new RabbitMQConfigModel();
-        }
+        public string RabbitPassword { get; set; } = String.Empty;
     }
 }
