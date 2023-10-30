@@ -173,18 +173,13 @@ namespace Storage.Database.Repositories
         {
             return new CurrencyValueByDate
             {
-                // Id = bindingModel.Id,
-                
                 BaseCurrency = _context.СurrencyInfos
                 .Where(c => c.Id == bindingModel.BaseCurrencyId)
-                .FirstOrDefault() ?? new CurrencyInfo(),
+                .FirstOrDefault() ?? throw new Exception("Нет такой валюты"),
                 
                 Currency = _context.СurrencyInfos
                 .Where(c => c.Id == bindingModel.CurrencyId)
-                .FirstOrDefault() ?? new CurrencyInfo(),
-
-                //BaseCurrency = bindingModel.BaseCurrencyId,
-                //Currency = bindingModel.CurrencyId,
+                .FirstOrDefault() ?? throw new Exception("Нет такой валюты"),
 
                 Date = bindingModel.Date,
                 Value = bindingModel.Value,

@@ -12,6 +12,7 @@ using Hangfire.PostgreSql;
 using MassTransit;
 using MassTransit.Definition;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace Crawler.Main.Extensions
@@ -59,6 +60,8 @@ namespace Crawler.Main.Extensions
             services.AddHangfireServer();
 
             services.AddScoped<IUploadDateRepository, UploadDateRepository>();
+
+            services.Configure<MySettings>(conf.GetSection("MySettings"));
 
             services.AddMassTransit(busConfigurator =>
             {

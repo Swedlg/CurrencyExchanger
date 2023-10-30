@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Crawler.Core.BusinessLogics.BindingModels;
+using Crawler.Core.BusinessLogics.ConfigModels;
 using Crawler.Core.BusinessLogics.Helpers;
 using Crawler.Core.BusinessLogics.Interfaces;
 using ExchangeData.DTOModels.CrawlerToConvert;
 using ExchangeData.DTOModels.CrawlerToStorage;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace Crawler.Core.BusinessLogics.Services
@@ -41,6 +43,11 @@ namespace Crawler.Core.BusinessLogics.Services
         private readonly HttpClient _httpClient;
 
         /// <summary>
+        /// Пользовательские настройки.
+        /// </summary>
+        private readonly MySettings _settings;
+
+        /// <summary>
         /// Конструктор.
         /// </summary>
         /// <param name="mapper">Маппер.</param>
@@ -48,12 +55,14 @@ namespace Crawler.Core.BusinessLogics.Services
         /// <param name="logger"></param>
         /// <param name="latestUploadDateRepository"></param>
         /// <param name="httpClient"></param>
+        /// <param name="settings"></param>
         public GetCurranciesService(
             IMapper mapper,
             IPublishEndpoint publishEndpoint,
             ILogger<GetCurranciesService> logger,
             IUploadDateRepository latestUploadDateRepository,
-            HttpClient httpClient)
+            HttpClient httpClient,
+            IOptions<MySettings> settings)
         {
             _mapper = mapper;
             _publishEndpoint = publishEndpoint;
@@ -61,6 +70,7 @@ namespace Crawler.Core.BusinessLogics.Services
             _latestUploadDateRepository = latestUploadDateRepository;
             _httpClient = httpClient;
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _settings = settings.Value;
         }
 
         /// <summary>
@@ -87,7 +97,7 @@ namespace Crawler.Core.BusinessLogics.Services
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
 
             //DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddYears(-2);  : latestUploadDate.UploadDate;
-            DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddDays(-5) : latestUploadDate.UploadDate;
+            DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddDays(_settings.SinceDaysCount) : latestUploadDate.UploadDate;
 
             if (iteratorDate < currentDate)
             {
@@ -229,13 +239,13 @@ namespace Crawler.Core.BusinessLogics.Services
 
             #region Парсим строки XML в BindingModel'и
 
-            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlStringInfo);
+            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper.Parse<ValutaListXMLBindingModel>(xmlStringInfo);
 
             List<ValCursListXMLBindingModel> valCursListXMLBindingModels = new();
 
             foreach (var str in xmlStringValuesList)
             {
-                var newListValue = XmlParseHelper<ValCursListXMLBindingModel>.Parse(str);
+                var newListValue = XmlParseHelper.Parse<ValCursListXMLBindingModel>(str);
                 if (newListValue != null)
                 {
                     valCursListXMLBindingModels.Add(newListValue);
@@ -287,13 +297,13 @@ namespace Crawler.Core.BusinessLogics.Services
 
             #region Парсим строки XML в BindingModel'и
 
-            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlStringInfo);
+            ValutaListXMLBindingModel? valutaListXMLBindingModel = XmlParseHelper.Parse<ValutaListXMLBindingModel>(xmlStringInfo);
 
             List<ValCursListXMLBindingModel> valCursListXMLBindingModels = new();
 
             foreach (var str in xmlStringValuesList)
             {
-                var newListValue = XmlParseHelper<ValCursListXMLBindingModel>.Parse(str);
+                var newListValue = XmlParseHelper.Parse<ValCursListXMLBindingModel>(str);
                 if (newListValue != null)
                 {
                     valCursListXMLBindingModels.Add(newListValue);
@@ -330,7 +340,7 @@ namespace Crawler.Core.BusinessLogics.Services
                 }
             };
 
-            ValutaListXMLBindingModel? currencyData = XmlParseHelper<ValutaListXMLBindingModel>.Parse(xmlString);
+            ValutaListXMLBindingModel? currencyData = XmlParseHelper.Parse<ValutaListXMLBindingModel>(xmlString);
 
             List<CurrencyInfoDTO>? valuteInfoList = currencyData?.Items?.Select(valuteInfo => _mapper.Map<CurrencyInfoDTO>(valuteInfo)).ToList();
 
@@ -352,7 +362,7 @@ namespace Crawler.Core.BusinessLogics.Services
         {
             List<RubleQuoteDTO> itemList = new();
 
-            ValCursListXMLBindingModel? currencyData = XmlParseHelper<ValCursListXMLBindingModel>.Parse(xmlString);
+            ValCursListXMLBindingModel? currencyData = XmlParseHelper.Parse<ValCursListXMLBindingModel>(xmlString);
 
             List<RubleQuoteDTO>? currencyValuesList = currencyData?.Valutes?.Select(valuteValue => _mapper.Map<RubleQuoteDTO>(valuteValue)).ToList();
 
