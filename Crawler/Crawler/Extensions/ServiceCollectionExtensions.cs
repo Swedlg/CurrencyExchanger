@@ -1,4 +1,5 @@
 ﻿using Crawler.Core.BusinessLogics;
+using Crawler.Core.BusinessLogics.ConfigModels;
 using Crawler.Core.BusinessLogics.Helpers;
 using Crawler.Core.BusinessLogics.Interfaces;
 using Crawler.Core.BusinessLogics.Services;
@@ -61,7 +62,10 @@ namespace Crawler.Main.Extensions
 
             services.AddScoped<IUploadDateRepository, UploadDateRepository>();
 
-            services.Configure<MySettings>(conf.GetSection("MySettings"));
+            //services.Configure<MySettings>(conf.GetSection(nameof(MySettings)));
+
+            services.ConfigureOptions<MySettingsSetup>();
+
 
             services.AddMassTransit(busConfigurator =>
             {

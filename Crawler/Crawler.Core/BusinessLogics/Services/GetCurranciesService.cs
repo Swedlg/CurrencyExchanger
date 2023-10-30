@@ -62,7 +62,7 @@ namespace Crawler.Core.BusinessLogics.Services
             ILogger<GetCurranciesService> logger,
             IUploadDateRepository latestUploadDateRepository,
             HttpClient httpClient,
-            IOptions<MySettings> settings)
+            IOptionsSnapshot<MySettings> settings)
         {
             _mapper = mapper;
             _publishEndpoint = publishEndpoint;
@@ -99,7 +99,7 @@ namespace Crawler.Core.BusinessLogics.Services
             //DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddYears(-2);  : latestUploadDate.UploadDate;
             DateOnly iteratorDate = latestUploadDate == null ? currentDate.AddDays(_settings.SinceDaysCount) : latestUploadDate.UploadDate;
 
-            if (iteratorDate < currentDate)
+             if (iteratorDate < currentDate)
             {
                 while (iteratorDate <= currentDate)
                 {
